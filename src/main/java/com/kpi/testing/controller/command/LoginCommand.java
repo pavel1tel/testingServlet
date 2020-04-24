@@ -2,9 +2,9 @@ package com.kpi.testing.controller.command;
 
 import javax.servlet.http.HttpServletRequest;
 
-public class IndexCommand implements Command {
+public class LoginCommand implements Command{
     @Override
     public String execute(HttpServletRequest request) {
-        return "/index.jsp";
+        return "/WEB-INF/templates/accounts/login.jsp";
     }
 }
