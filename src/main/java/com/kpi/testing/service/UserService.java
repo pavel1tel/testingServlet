@@ -13,7 +13,7 @@ public class UserService {
         userDao = factory.createUserDao();
     }
 
-    public User loadUserByUsername(String s) throws UsernameNotFoundException {
+    public User loadUserByEmail(String s) throws UsernameNotFoundException {
         return userDao.findByEmail(s).orElseThrow(() -> new UsernameNotFoundException(String.format("User with email %s not found", s)));
     }
 }

@@ -23,7 +23,6 @@
     <p style="margin-left: 2rem">
         <fmt:message key="string.var"/>
     </p>
-    <c:out value="${sessionScope.username}"/>
 </div>
 <%@ include file="WEB-INF/templates/fragments/footer.jsp" %>
 

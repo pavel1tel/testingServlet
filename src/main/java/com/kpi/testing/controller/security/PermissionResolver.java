@@ -19,7 +19,4 @@ public class PermissionResolver {
         return session.getAttribute("user") != null;
     }
 
-    public User getUser(HttpSession session){
-        return (User) session.getAttribute("user");
-    }
 }

@@ -27,13 +27,14 @@
             <fmt:message key="string.reg.title.login" />
         </h2>
         <div class="form-group">
-            <label for="username">Username</label>
-            <input name="username" id="username" type="email" class="form-control" placeholder="${email_place}"
-                                                 required="required">
+            <label for="email">${email_place}</label>
+            <input name="email" id="email" type="email" class="form-control" placeholder="${email_place}"
+                                              required="required">
         </div>
         <div class="form-group">
+            <label for="password">${password_place}</label>
             <input type="password" name="password" id="password" class="form-control" placeholder="${password_place}"
-                   required="required">
+                                                 required="required">
         </div>
         <div class="form-group">
             <button type="submit" class="btn btn-primary btn-block">
