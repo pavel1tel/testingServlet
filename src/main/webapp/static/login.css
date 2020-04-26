@@ -34,12 +34,11 @@ body {
 }
 
 .error {
-    display:block;
     font-size : 13px;
-    color: #ed1327
+    color: #ed1327;
 }
 
-#logout {
+.logout {
     font-size : 13px;
     color: #a6aaa8;
 }

@@ -1,13 +1,12 @@
 package com.kpi.testing.controller.security;
 
 import com.kpi.testing.entity.User;
-import com.kpi.testing.exceptions.PasswordMismatchException;
+import com.kpi.testing.exceptions.InvalidUserException;
 import com.kpi.testing.exceptions.UsernameNotFoundException;
 import com.kpi.testing.service.UserService;
 import com.kpi.testing.util.BCryptEncoder;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 public class AuthorizationInterceptor {
@@ -22,11 +21,11 @@ public class AuthorizationInterceptor {
         return userService.loadUserByEmail(email);
     }
 
-    public User matchPasswords(User user, String password) throws PasswordMismatchException {
+    public User matchPasswords(User user, String password) throws InvalidUserException {
         if(encoder.matches(password, user.getPassword())){
             return user;
         } else {
-            throw new PasswordMismatchException();
+            throw new InvalidUserException();
         }
     }
 

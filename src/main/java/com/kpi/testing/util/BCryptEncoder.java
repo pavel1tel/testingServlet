@@ -7,7 +7,7 @@ import java.util.regex.Pattern;
 public class BCryptEncoder {
     private final Pattern BCRYPT_PATTERN = Pattern.compile("\\A\\$2a?\\$(\\d\\d)\\$[./0-9A-Za-z]{53}");
 
-    public static String encode(CharSequence rawPassword) {
+    public  String encode(CharSequence rawPassword) {
         String salt;
         int strength = 10; //default in spring
         salt = BCrypt.gensalt(strength, new SecureRandom());

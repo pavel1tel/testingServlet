@@ -49,10 +49,18 @@
                 <fmt:message key="string.forgot.password" />
             </a>
         </div>
-<%--        <div style="display: flex; align-items: center; justify-content: center">--%>
-<%--            <p class="error" th:if="${param.error}" th:text="#{string.login.invalid.username.password}"></p>--%>
-<%--            <p id="logout" class="FadeIn fifth" th:if="${param.logout}" th:text="#{string.login.user.been.logged.out}"></p>--%>
-<%--        </div>--%>
+        <div>
+            <c:if test="${param.error}">
+                <div class="error text-center">
+                    <fmt:message key="string.login.invalid.username.password" />
+                </div>
+            </c:if>
+            <c:if test="${param.logout}">
+                <div class="logout text-center">
+                    <fmt:message key="string.login.user.been.logged.out" />
+                </div>
+            </c:if>
+        </div>
     </form>
     <p class="text-center"><a href="${pageContext.request.contextPath}/app/accounts/registration">
         <fmt:message key="string.login.button.create.account" />

@@ -23,9 +23,6 @@
             <filter-name>LoggedInFilter</filter-name>
             <filter-class>com.kpi.testing.controller.filters.LoggedInFilter</filter-class>
         </filter>
-        <listener>
-            <listener-class>com.kpi.testing.controller.security.SessionListener</listener-class>
-        </listener>
         <filter-mapping>
             <filter-name>LoggedInFilter</filter-name>
             <url-pattern>/*</url-pattern>

@@ -181,7 +181,6 @@ public class JDBCUserDAO implements UserDAO {
             ps.setString(7, LocalDate.now().toString());
             ps.executeUpdate();
         } catch (SQLException exeption) {
-            exeption.printStackTrace();
             throw new RuntimeException();
         }
     }

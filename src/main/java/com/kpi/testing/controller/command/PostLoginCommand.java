@@ -3,11 +3,10 @@ package com.kpi.testing.controller.command;
 import com.kpi.testing.controller.security.AuthorizationInterceptor;
 import com.kpi.testing.entity.User;
 import com.kpi.testing.entity.enums.Status;
-import com.kpi.testing.exceptions.PasswordMismatchException;
+import com.kpi.testing.exceptions.InvalidUserException;
 import com.kpi.testing.exceptions.UsernameNotFoundException;
 import com.kpi.testing.service.UserService;
 
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -24,6 +23,7 @@ public class PostLoginCommand implements Command{
 
     @Override
     public void execute(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        //todo logout and new login
         if(!authorizationInterceptor.isLoggedIn(request)) {
             HttpSession session = request.getSession();
             User user;
@@ -36,12 +36,12 @@ public class PostLoginCommand implements Command{
                 user = authorizationInterceptor.loadUserByEmail(email);
                 user = authorizationInterceptor.matchPasswords(user, password);
                 if(user.getStatus().equals(Status.Deleted)){
-                    response.sendRedirect(request.getContextPath() + "/app" + "/accounts/login?error");
+                    response.sendRedirect(request.getContextPath() + "/app" + "/accounts/login?error=true");
                 }
                 String sessionID = authorizationInterceptor.createSession(session, user, rememberMe);
-            } catch (UsernameNotFoundException | PasswordMismatchException e) {
+            } catch (UsernameNotFoundException | InvalidUserException e) {
                 response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                response.sendRedirect(request.getContextPath() + "/app" + "/accounts/login?error");
+                response.sendRedirect(request.getContextPath() + "/app" + "/accounts/login?error=true");
                 return;
             }
         }

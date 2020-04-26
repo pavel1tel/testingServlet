@@ -23,8 +23,10 @@ public class Servlet extends HttpServlet {
         getCommands.put("index", new IndexCommand());
         getCommands.put("error", new ErrorCommand());
         getCommands.put("accounts/registration", new RegistrationCommand());
+        getCommands.put("accounts/logout", new LogoutCommand());
 
         postCommands.put("accounts/login", new PostLoginCommand(userService));
+        postCommands.put("accounts/registration", new PostRegistrationCommand(userService));
 
     }
 
@@ -42,10 +44,5 @@ public class Servlet extends HttpServlet {
         path = path.replaceAll(".*/app/" , "");
         Command command = commands.getOrDefault(path , new ErrorCommand());
         command.execute(request, response);
-//        if(page.contains("redirect:")){
-//            response.sendRedirect(request.getContextPath()+page.replace("redirect:", "/app"));
-//        }else {
-//            request.getRequestDispatcher(page).forward(request, response);
-//        }
     }
 }
