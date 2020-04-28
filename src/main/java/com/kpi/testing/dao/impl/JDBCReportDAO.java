@@ -83,6 +83,7 @@ public class JDBCReportDAO implements ReportDAO {
             Map<Long, Report> reports = new HashMap<>();
             while (rs1.next()) {
                 Report report = makeUniqueReport(reports, extractReport(rs1));
+
                 User inspector = extractUser(rs1);
                 if (isUniqUser(inspectors, inspector)
                         && rs1.getLong("report_id") == rs1.getLong("reports.id")) {

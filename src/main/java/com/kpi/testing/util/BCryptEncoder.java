@@ -1,6 +1,8 @@
 package com.kpi.testing.util;
 
 import org.mindrot.jbcrypt.BCrypt;
+import org.modelmapper.ModelMapper;
+
 import java.security.SecureRandom;
 import java.util.regex.Pattern;
 
@@ -27,7 +29,5 @@ public class BCryptEncoder {
     }
 
     public static void main(String[] args) {
-        //System.out.println(encode("grib1111"));
-        System.out.println(new BCryptEncoder().matches("grib1111", "$2a$10$r.SHIFgRvMxf/NdWCsX89e2JLEHejb0r448vOLUkQDpYTs.VBfAl."));
     }
 }

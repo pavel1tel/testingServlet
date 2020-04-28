@@ -1,6 +1,8 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<%@ page pageEncoding="UTF-8"%>
+<fmt:setLocale value="${sessionScope.locale}" />
 <fmt:setBundle basename="messages"/>
 <!DOCTYPE html>
 <html lang="en">
@@ -15,11 +17,13 @@
 
     <div class="collapse navbar-collapse" id="navbarTogglerDemo03">
         <ul class="navbar-nav mr-auto mt-2 mt-lg-0">
+            <c:if test="${not empty sessionScope.homeUrl}">
             <li class="nav-item active">
-                <a class="nav-link" href="${pageContext.request.contextPath}/app/home">
+                <a class="nav-link" href="${sessionScope.homeUrl}">
                     <fmt:message key="string.home"/>
                 </a>
             </li>
+            </c:if>
         </ul>
         <div class="form-inline my-2 my-lg-0">
             <c:choose>

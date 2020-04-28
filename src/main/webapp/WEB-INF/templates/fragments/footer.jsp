@@ -1,8 +1,9 @@
-<!DOCTYPE html>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
-<fmt:setBundle basename="messages" />
+<%@ page pageEncoding="UTF-8"%>
+<fmt:setLocale value="${sessionScope.locale}" />
+<fmt:setBundle basename="messages"/>
 <html>
 <head>
     <meta charset="UTF-8">

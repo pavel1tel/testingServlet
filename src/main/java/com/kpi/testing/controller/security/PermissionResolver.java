@@ -15,8 +15,4 @@ public class PermissionResolver {
         return user.getRole().equals(Role.ROLE_USER);
     }
 
-    public boolean isLoggedIn(HttpSession session){
-        return session.getAttribute("user") != null;
-    }
-
 }

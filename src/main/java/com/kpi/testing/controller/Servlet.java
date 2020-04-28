@@ -1,6 +1,7 @@
 package com.kpi.testing.controller;
 
 import com.kpi.testing.controller.command.*;
+import com.kpi.testing.service.ReportService;
 import com.kpi.testing.service.UserService;
 
 import javax.servlet.ServletException;
@@ -19,11 +20,13 @@ public class Servlet extends HttpServlet {
     public void init() throws ServletException {
         super.init();
         UserService userService = new UserService();
+        ReportService reportService = new ReportService();
         getCommands.put("accounts/login", new LoginCommand());
         getCommands.put("index", new IndexCommand());
         getCommands.put("error", new ErrorCommand());
         getCommands.put("accounts/registration", new RegistrationCommand());
         getCommands.put("accounts/logout", new LogoutCommand());
+        getCommands.put("userHome", new UserHomeCommand(reportService));
 
         postCommands.put("accounts/login", new PostLoginCommand(userService));
         postCommands.put("accounts/registration", new PostRegistrationCommand(userService));
