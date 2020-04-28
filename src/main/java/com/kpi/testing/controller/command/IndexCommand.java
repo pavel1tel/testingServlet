@@ -2,6 +2,8 @@ package com.kpi.testing.controller.command;
 
 import com.kpi.testing.entity.User;
 import com.kpi.testing.entity.enums.Role;
+import com.kpi.testing.exceptions.UsernameNotFoundException;
+import com.kpi.testing.service.UserService;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -11,16 +13,29 @@ import java.io.IOException;
 
 public class IndexCommand implements Command {
 
+    UserService userService;
+
+    public IndexCommand(UserService userService) {
+        this.userService = userService;
+    }
+
     @Override
     public void execute(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         HttpSession session = request.getSession();
-        boolean loggedIn = Boolean.parseBoolean(session.getAttribute("loggedIn").toString());
-        if (loggedIn) {
-            User user = (User) session.getAttribute("user");
-            if (user.getRole().equals(Role.ROLE_USER)){
-                request.getSession().setAttribute("homeUrl", request.getContextPath() + "/app/userHome");
-            } else if (user.getRole().equals(Role.ROLE_INSPECTOR)){
-                request.getSession().setAttribute("homeUrl", request.getContextPath() + "/app/inspHome");
+        boolean loggedIn = Boolean.parseBoolean(request.getSession().getAttribute("loggedIn").toString());
+        if (loggedIn){
+            long userId = Long.parseLong(request.getSession().getAttribute("user").toString());
+            request.setAttribute("loggedIn", loggedIn);
+            try {
+                User user = userService.findById(userId);
+                if (user.getRole().equals(Role.ROLE_USER)){
+                    request.setAttribute("homeUrl", request.getContextPath() + "/app/userHome");
+                } else if (user.getRole().equals(Role.ROLE_INSPECTOR)){
+                    request.setAttribute("homeUrl", request.getContextPath() + "/app/inspHome");
+                }
+            } catch (UsernameNotFoundException ex) {
+                ex.printStackTrace();
+                return;
             }
         }
         request.getRequestDispatcher("/index.jsp").forward(request, response);

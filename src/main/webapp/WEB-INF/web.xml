@@ -41,16 +41,11 @@
     </filter-mapping>
     <filter-mapping>
         <filter-name>AuthFilter</filter-name>
-        <url-pattern>/app/home/*</url-pattern>
-    </filter-mapping>
-    <filter>
-        <filter-name>LoggedInFilter</filter-name>
-        <filter-class>com.kpi.testing.controller.filters.LoggedInFilter</filter-class>
-    </filter>
-    <filter-mapping>
-        <filter-name>LoggedInFilter</filter-name>
         <url-pattern>/*</url-pattern>
     </filter-mapping>
+    <listener>
+        <listener-class>com.kpi.testing.controller.filters.SessionListener</listener-class>
+    </listener>
     <error-page>
         <exception-type>java.lang.Exception</exception-type>
         <location>/WEB-INF/templates/error.jsp</location>

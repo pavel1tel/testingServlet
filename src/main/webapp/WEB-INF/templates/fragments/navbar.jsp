@@ -17,9 +17,9 @@
 
     <div class="collapse navbar-collapse" id="navbarTogglerDemo03">
         <ul class="navbar-nav mr-auto mt-2 mt-lg-0">
-            <c:if test="${not empty sessionScope.homeUrl}">
+            <c:if test="${not empty requestScope.homeUrl}">
             <li class="nav-item active">
-                <a class="nav-link" href="${sessionScope.homeUrl}">
+                <a class="nav-link" href="${requestScope.homeUrl}">
                     <fmt:message key="string.home"/>
                 </a>
             </li>

@@ -1,6 +1,7 @@
 package com.kpi.testing.controller;
 
 import com.kpi.testing.controller.command.*;
+import com.kpi.testing.exceptions.UsernameNotFoundException;
 import com.kpi.testing.service.ReportService;
 import com.kpi.testing.service.UserService;
 
@@ -22,11 +23,11 @@ public class Servlet extends HttpServlet {
         UserService userService = new UserService();
         ReportService reportService = new ReportService();
         getCommands.put("accounts/login", new LoginCommand());
-        getCommands.put("index", new IndexCommand());
+        getCommands.put("index", new IndexCommand(userService));
         getCommands.put("error", new ErrorCommand());
         getCommands.put("accounts/registration", new RegistrationCommand());
         getCommands.put("accounts/logout", new LogoutCommand());
-        getCommands.put("userHome", new UserHomeCommand(reportService));
+        getCommands.put("userHome", new UserHomeCommand(reportService, userService));
 
         postCommands.put("accounts/login", new PostLoginCommand(userService));
         postCommands.put("accounts/registration", new PostRegistrationCommand(userService));

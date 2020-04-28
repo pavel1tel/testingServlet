@@ -30,13 +30,15 @@ public class AuthorizationInterceptor {
     }
 
     public boolean isLoggedIn(HttpServletRequest request){
-        return  (boolean) request.getSession().getAttribute("loggedIn");
+        return  Boolean.parseBoolean(request.getSession().getAttribute("loggedIn").toString());
     }
 
     public String createSession(HttpSession session, User user, String rememberMe) {
-        session.setAttribute("user", user);
+        session.setAttribute("user", user.getId());
+        session.setAttribute("username", user.getUsername());
+        session.setAttribute("loggedIn", true);
         if(rememberMe!=null && rememberMe.equals("on")){
-            //todo dont work, create separate table with useer session and cookies for validation
+            //todo dont work, create separate table with user session and cookies for validation
             session.setMaxInactiveInterval(24*60*60);
         }
         return session.getId();

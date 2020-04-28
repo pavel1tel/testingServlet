@@ -25,6 +25,10 @@ public class UserService {
         return userDao.findByEmail(s).orElseThrow(() -> new UsernameNotFoundException(String.format("User with email %s not found", s)));
     }
 
+    public User findById(Long id) throws UsernameNotFoundException {
+        return userDao.findById(id).orElseThrow(() -> new UsernameNotFoundException(String.format("User with id %d not found", id)));
+    }
+
     public void registration (User user) throws InvalidUserException, UserExistsException {
         NewUserValidator validator = new NewUserValidator();
         BCryptEncoder encoder = new BCryptEncoder();

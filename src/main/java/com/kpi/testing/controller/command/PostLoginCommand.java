@@ -24,7 +24,7 @@ public class PostLoginCommand implements Command{
     @Override
     public void execute(HttpServletRequest request, HttpServletResponse response) throws IOException {
         //todo logout and new login
-        if(!authorizationInterceptor.isLoggedIn(request)) {
+        if(request.getSession().getAttribute("user") == null) {
             HttpSession session = request.getSession();
             User user;
             try {
