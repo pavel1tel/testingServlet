@@ -2,6 +2,7 @@ package com.kpi.testing.controller.filters;
 
 import com.kpi.testing.controller.security.PermissionResolver;
 import com.kpi.testing.entity.User;
+import com.kpi.testing.entity.enums.Role;
 import com.kpi.testing.exceptions.UsernameNotFoundException;
 import com.kpi.testing.service.UserService;
 
@@ -25,17 +26,16 @@ public class AuthFilter implements Filter {
         HttpSession session = request.getSession();
         PermissionResolver pr = new PermissionResolver();
         UserService userService = new UserService();
-        String role = "ROLE_GUEST";
+        Role role = Role.ROLE_GUEST;
         if (Boolean.parseBoolean(request.getSession().getAttribute("loggedIn").toString())) {
             Long userId = Long.parseLong(request.getSession().getAttribute("user").toString());
             try {
                 User user = userService.findById(userId);
-                role = user.getRole().name();
+                role = user.getRole();
             } catch (UsernameNotFoundException e) {
                 response.sendError(403);
             }
         }
-        System.out.println(pr.isAbleToAccess(request, role));
         if(!pr.isAbleToAccess(request, role)) {
             request.getRequestDispatcher("/WEB-INF/templates/denied.jsp").forward(request, servletResponse);
             return;

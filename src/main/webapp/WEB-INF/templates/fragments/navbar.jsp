@@ -13,13 +13,13 @@
             aria-controls="navbarTogglerDemo03" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
     </button>
-    <a class="navbar-brand" href="${pageContext.request.contextPath}">Testing</a>
+    <a class="navbar-brand" href="${pageContext.request.contextPath}/app/index">Testing</a>
 
     <div class="collapse navbar-collapse" id="navbarTogglerDemo03">
         <ul class="navbar-nav mr-auto mt-2 mt-lg-0">
-            <c:if test="${not empty requestScope.homeUrl}">
+            <c:if test="${not empty sessionScope.homeUrl}">
             <li class="nav-item active">
-                <a class="nav-link" href="${requestScope.homeUrl}">
+                <a class="nav-link" href="${sessionScope.homeUrl}">
                     <fmt:message key="string.home"/>
                 </a>
             </li>

@@ -30,7 +30,6 @@
 <body>
 <%@ include file="../fragments/navbar.jsp" %>
 <div class="content">
-    ${uri}
 
     <table class="table-condensed table table-hover" style="border-collapse:collapse;">
         <caption>
@@ -133,7 +132,7 @@
     </c:forEach>
         <tbody>
     </table>
-    <a href="${pageContext.request.contextPath}/app/userHome/add/">
+    <a href="${pageContext.request.contextPath}/app/userHome/add">
         <button type="button" class="btn btn-outline-success btn-lg">
             <fmt:message key="string.add" />
         </button>

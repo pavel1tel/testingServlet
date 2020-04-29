@@ -27,7 +27,4 @@ public class BCryptEncoder {
             return false;
         }
     }
-
-    public static void main(String[] args) {
-    }
 }

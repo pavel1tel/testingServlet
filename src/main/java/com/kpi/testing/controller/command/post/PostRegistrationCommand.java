@@ -1,5 +1,6 @@
-package com.kpi.testing.controller.command;
+package com.kpi.testing.controller.command.post;
 
+import com.kpi.testing.controller.command.Command;
 import com.kpi.testing.entity.User;
 import com.kpi.testing.exceptions.InvalidUserException;
 import com.kpi.testing.exceptions.UserExistsException;
@@ -11,7 +12,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
-public class PostRegistrationCommand implements Command{
+public class PostRegistrationCommand implements Command {
     UserService userService;
 
     public PostRegistrationCommand(UserService userService) {

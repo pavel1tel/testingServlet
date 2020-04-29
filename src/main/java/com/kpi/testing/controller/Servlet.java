@@ -1,7 +1,11 @@
 package com.kpi.testing.controller;
 
 import com.kpi.testing.controller.command.*;
-import com.kpi.testing.exceptions.UsernameNotFoundException;
+import com.kpi.testing.controller.command.get.*;
+import com.kpi.testing.controller.command.get.UserHomeCommand;
+import com.kpi.testing.controller.command.post.PostAddCommand;
+import com.kpi.testing.controller.command.post.PostLoginCommand;
+import com.kpi.testing.controller.command.post.PostRegistrationCommand;
 import com.kpi.testing.service.ReportService;
 import com.kpi.testing.service.UserService;
 
@@ -28,10 +32,12 @@ public class Servlet extends HttpServlet {
         getCommands.put("accounts/registration", new RegistrationCommand());
         getCommands.put("accounts/logout", new LogoutCommand());
         getCommands.put("userHome", new UserHomeCommand(reportService, userService));
+        getCommands.put("inspHome", new InspHomeCommand(reportService, userService));
+        getCommands.put("userHome/add", new AddCommand());
 
         postCommands.put("accounts/login", new PostLoginCommand(userService));
         postCommands.put("accounts/registration", new PostRegistrationCommand(userService));
-
+        postCommands.put("userHome/add", new PostAddCommand(reportService, userService));
     }
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {

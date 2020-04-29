@@ -1,5 +1,6 @@
-package com.kpi.testing.controller.command;
+package com.kpi.testing.controller.command.post;
 
+import com.kpi.testing.controller.command.Command;
 import com.kpi.testing.controller.security.AuthorizationInterceptor;
 import com.kpi.testing.entity.User;
 import com.kpi.testing.entity.enums.Status;
@@ -12,7 +13,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
 
-public class PostLoginCommand implements Command{
+public class PostLoginCommand implements Command {
     private final AuthorizationInterceptor authorizationInterceptor;
     UserService userService;
 

@@ -1,5 +1,6 @@
-package com.kpi.testing.controller.command;
+package com.kpi.testing.controller.command.get;
 
+import com.kpi.testing.controller.command.Command;
 import com.kpi.testing.entity.User;
 import com.kpi.testing.entity.enums.Role;
 import com.kpi.testing.exceptions.UsernameNotFoundException;
@@ -21,7 +22,6 @@ public class IndexCommand implements Command {
 
     @Override
     public void execute(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        HttpSession session = request.getSession();
         boolean loggedIn = Boolean.parseBoolean(request.getSession().getAttribute("loggedIn").toString());
         if (loggedIn){
             long userId = Long.parseLong(request.getSession().getAttribute("user").toString());
@@ -29,9 +29,9 @@ public class IndexCommand implements Command {
             try {
                 User user = userService.findById(userId);
                 if (user.getRole().equals(Role.ROLE_USER)){
-                    request.setAttribute("homeUrl", request.getContextPath() + "/app/userHome");
+                    request.getSession().setAttribute("homeUrl", request.getContextPath() + "/app/userHome");
                 } else if (user.getRole().equals(Role.ROLE_INSPECTOR)){
-                    request.setAttribute("homeUrl", request.getContextPath() + "/app/inspHome");
+                    request.getSession().setAttribute("homeUrl", request.getContextPath() + "/app/inspHome");
                 }
             } catch (UsernameNotFoundException ex) {
                 ex.printStackTrace();

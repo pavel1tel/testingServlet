@@ -1,8 +1,14 @@
 <!DOCTYPE html>
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<%@ page pageEncoding="UTF-8"%>
+<fmt:setLocale value="${sessionScope.locale}" />
+<fmt:setBundle basename="messages"/>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>404 Error</title>
+    <title>403 Error</title>
     <link href="//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
     <script src="//netdna.bootstrapcdn.com/bootstrap/3.0.0/js/bootstrap.min.js"></script>
     <script src="//code.jquery.com/jquery-1.11.1.min.js"></script>
@@ -23,6 +29,7 @@
                 <h1>Ooops!</h1>
                 <h2>Access denied</h2>
                 <p>Sorry, an error has occured, you are not allowed to be here!</p>
+                <button onclick="location.href='${pageContext.request.contextPath}/app/index'" type="button" class="btn btn-outline-secondary">Go no main page</button>
             </div>
         </div>
     </div>

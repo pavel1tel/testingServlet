@@ -1,16 +1,16 @@
-package com.kpi.testing.controller.command;
+package com.kpi.testing.controller.command.get;
+
+import com.kpi.testing.controller.command.Command;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.Arrays;
 
-public class LogoutCommand implements Command {
+public class RegistrationCommand implements Command {
 
     @Override
     public void execute(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-        request.getSession().invalidate();
-        response.sendRedirect(request.getContextPath()+"/app" + "/accounts/login?logout=true");
+        request.getRequestDispatcher("/WEB-INF/templates/accounts/registration.jsp").forward(request, response);
     }
 }
