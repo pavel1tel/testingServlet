@@ -3,18 +3,18 @@ package com.kpi.testing.dto;
 
 import javax.validation.constraints.NotNull;
 
-public class ReportDTO {
+public class AddReportDTO {
     @NotNull
     private String name;
     @NotNull
     private String description;
 
-    public ReportDTO(String name, String description) {
+    public AddReportDTO(String name, String description) {
         this.name = name;
         this.description = description;
     }
 
-    public ReportDTO() {
+    public AddReportDTO() {
     }
 
     public String getName() {

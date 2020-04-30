@@ -6,6 +6,7 @@ import com.kpi.testing.controller.command.get.UserHomeCommand;
 import com.kpi.testing.controller.command.post.PostAddCommand;
 import com.kpi.testing.controller.command.post.PostLoginCommand;
 import com.kpi.testing.controller.command.post.PostRegistrationCommand;
+import com.kpi.testing.controller.command.post.PostUpdateCommand;
 import com.kpi.testing.service.ReportService;
 import com.kpi.testing.service.UserService;
 
@@ -16,6 +17,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 public class Servlet extends HttpServlet {
     private final Map<String, Command> getCommands = new HashMap<>();
@@ -34,10 +36,13 @@ public class Servlet extends HttpServlet {
         getCommands.put("userHome", new UserHomeCommand(reportService, userService));
         getCommands.put("inspHome", new InspHomeCommand(reportService, userService));
         getCommands.put("userHome/add", new AddCommand());
+        getCommands.put("userHome/update/[1-9]*", new UpdateCommand(reportService));
 
         postCommands.put("accounts/login", new PostLoginCommand(userService));
         postCommands.put("accounts/registration", new PostRegistrationCommand(userService));
         postCommands.put("userHome/add", new PostAddCommand(reportService, userService));
+        postCommands.put("userHome/update/[1-9]*", new PostUpdateCommand(reportService));
+
     }
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -52,7 +57,8 @@ public class Servlet extends HttpServlet {
             ServletException {
         String path = request.getRequestURI();
         path = path.replaceAll(".*/app/" , "");
-        Command command = commands.getOrDefault(path , new ErrorCommand());
+        String match = commands.keySet().stream().filter(path::matches).findFirst().orElse("error");
+        Command command = commands.getOrDefault(match , new ErrorCommand());
         command.execute(request, response);
     }
 }

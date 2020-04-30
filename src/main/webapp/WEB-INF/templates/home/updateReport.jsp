@@ -7,17 +7,15 @@
 <fmt:setBundle basename="messages"/>
 <fmt:message key="string.name" var="name_place"/>
 <fmt:message key="string.description" var="desc_place"/>
-
-<html lang="en">
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
 <head>
     <meta charset="UTF-8">
     <title>
-        <fmt:message key="string.add.title"/>
+        <fmt:message key="string.update.title"/>
     </title>
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/static/css/login.css">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/static/css/userPage.css">
-
 
 
     <!-- Bootstrap CSS -->
@@ -26,22 +24,30 @@
 </head>
 <body>
 <%@ include file="../fragments/navbar.jsp" %>
+
 <div class="content">
-    <form method="post" action="${pageContext.request.contextPath}/app/userHome/add">
+    <h3>
+        <fmt:message key="string.reason.toggle"/>${requestScope.report.getDeclineReason()}
+    </h3>
+    <hr/>
+    <h1>
+        <fmt:message key="string.update.title"/>
+    </h1>
+    <form method="post" action="${pageContext.request.contextPath}/app/userHome/update/${requestScope.report.getId()}">
         <input id="csrfToken" name="csrfToken" type="hidden" value="${sessionScope.csrfToken}" />
         <div class="form-group">
             <label for="name">
                 <fmt:message key="string.name"/>
             </label>
-            <input name="name" type="text" required class="form-control" id="name"
-                   aria-describedby="username" placeholder="${name_place}">
+            <input name = "name" type="text" required class="form-control" id="name"
+                   aria-describedby="username" placeholder="${name_place}" value="${requestScope.report.getName()}">
         </div>
         <div class="form-group">
             <label for="description">
                 <fmt:message key="string.description"/>
             </label>
-            <input name ="description" type="text" required class="form-control" aria-describedby="description"
-                   placeholder="${desc_place}" id="description">
+            <input name="description" type="text" required class="form-control" aria-describedby="description"
+                   placeholder="${desc_place}" id="description" value="${requestScope.report.getDescription()}">
         </div>
         <button type="submit" class="btn btn-primary">
             <fmt:message key="string.submit"/>

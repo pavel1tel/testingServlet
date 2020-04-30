@@ -1,10 +1,8 @@
 package com.kpi.testing.controller.command.post;
 
 import com.kpi.testing.controller.command.Command;
-import com.kpi.testing.dto.ReportDTO;
-import com.kpi.testing.dto.ReportForInspectorReportTableDTO;
+import com.kpi.testing.dto.AddReportDTO;
 import com.kpi.testing.entity.User;
-import com.kpi.testing.entity.enums.ReportStatus;
 import com.kpi.testing.exceptions.UsernameNotFoundException;
 import com.kpi.testing.service.ReportService;
 import com.kpi.testing.service.UserService;
@@ -13,7 +11,6 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.List;
 
 public class PostAddCommand implements Command {
 
@@ -31,7 +28,7 @@ public class PostAddCommand implements Command {
         String name = request.getParameter(NAME_PARAM);
         String DESC_PARAM = "description";
         String description = request.getParameter(DESC_PARAM);
-        ReportDTO report = new ReportDTO();
+        AddReportDTO report = new AddReportDTO();
         report.setName(name);
         report.setDescription(description);
         Long userId = Long.parseLong(request.getSession().getAttribute("user").toString());

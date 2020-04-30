@@ -23,6 +23,7 @@
 <body>
 <div id="app" class="login-form">
     <form action="${pageContext.request.contextPath}/app/accounts/login" method="post">
+        <input id="csrfToken" name="csrfToken" type="hidden" value="${sessionScope.csrfToken}" />
         <h2 class="text-center">
             <fmt:message key="string.reg.title.login" />
         </h2>

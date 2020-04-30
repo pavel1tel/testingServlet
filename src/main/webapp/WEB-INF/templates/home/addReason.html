@@ -19,7 +19,7 @@
 <div class="content">
     <h1 th:text="#{string.decline.reason}"></h1>
     <form th:object="${report_reason}" method="post" th:action="@{'/home/decline/' + ${report_id}}">
-
+        <input id="csrfToken" name="csrfToken" type="hidden" value="${sessionScope.csrfToken}" />
         <div class="form-group">
             <label for="reason" th:text="#{string.reason}"></label>
             <input th:field="*{reason}" type="text" required class="form-control" id="reason"

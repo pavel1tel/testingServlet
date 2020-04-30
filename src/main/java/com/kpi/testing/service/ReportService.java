@@ -3,19 +3,21 @@ package com.kpi.testing.service;
 import com.kpi.testing.dao.DaoFactory;
 import com.kpi.testing.dao.ReportDAO;
 import com.kpi.testing.dao.UserDAO;
-import com.kpi.testing.dto.ReportDTO;
+import com.kpi.testing.dto.AddReportDTO;
 import com.kpi.testing.dto.ReportForInspectorReportTableDTO;
 import com.kpi.testing.dto.ReportForUserReportTableDTO;
+import com.kpi.testing.dto.UpdateReportDTO;
 import com.kpi.testing.entity.Report;
 import com.kpi.testing.entity.User;
 import com.kpi.testing.entity.enums.ReportStatus;
 import com.kpi.testing.entity.enums.Role;
+import com.kpi.testing.exceptions.UnknownReportError;
 import com.kpi.testing.util.SinglModelMapper;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
 
 import java.lang.reflect.Type;
-import java.util.ArrayList;
+import java.sql.SQLException;
 import java.util.Collections;
 import java.util.List;
 
@@ -43,12 +45,12 @@ public class ReportService {
         return modelMapper.map(reports, pageType);
     }
 
-    public Report getFromDTO(ReportDTO reportDTO) {
-        return modelMapper.map(reportDTO, Report.class);
+    public Report getFromDTO(AddReportDTO addReportDTO) {
+        return modelMapper.map(addReportDTO, Report.class);
     }
 
-    public void save(ReportDTO reportDTO, User owner) {
-        Report report = getFromDTO(reportDTO);
+    public void save(AddReportDTO addReportDTO, User owner) {
+        Report report = getFromDTO(addReportDTO);
         report.setStatus(ReportStatus.QUEUE);
         report.setOwner(owner);
         List<User> inspectors = getInscpectors();
@@ -64,5 +66,21 @@ public class ReportService {
         Collections.shuffle(list);
         int listSizeIndex = 2;
         return list.subList(0, listSizeIndex);
+    }
+
+    public UpdateReportDTO getForUpdate(Long id) throws UnknownReportError {
+        Report report = reportDAO.findById(id).orElseThrow(UnknownReportError::new);
+        return modelMapper.map(report, UpdateReportDTO.class);
+    }
+
+    public void update(Report report,UpdateReportDTO reportDTO) throws SQLException {
+        report.setName(reportDTO.getName());
+        report.setDescription(reportDTO.getDescription());
+        report.setStatus(ReportStatus.QUEUE);
+        reportDAO.update(report);
+    }
+
+    public Report getById(Long id) throws UnknownReportError {
+        return reportDAO.findById(id).orElseThrow(UnknownReportError::new);
     }
 }

@@ -81,7 +81,7 @@ public class JDBCUserDAO implements UserDAO {
                 .created(LocalDate.now())
                 .id(3L)
                 .build();
-        userDAO.update(user);
+        System.out.println(userDAO.findById(1L));
     }
 
     private boolean isUniqReport(Map<Long, Report> reports, Report report) {

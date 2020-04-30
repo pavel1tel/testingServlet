@@ -103,6 +103,7 @@
                 <c:if test="${report.getStatus().name() == 'NOT_ACCEPTED'}">
                     <td>
                         <form action="'${pageContext.request.contextPath}/app/userHome/change/${report.getId()}" method="post">
+                            <input id="csrfToken" name="csrfToken" type="hidden" value="${sessionScope.csrfToken}" />
                             <button type="submit" class="btn btn-danger" onclick="return confirm('You sure?')">
                                 <fmt:message key="string.replace" />
                             </button>
@@ -138,14 +139,8 @@
         </button>
     </a>
 
-<%--    <nav th:if="${reports.getTotalPages() != 0}" style="display: flex; justify-content: center"--%>
-<%--         aria-label="Page navigation example">--%>
-<%--        <ul class="pagination">--%>
-<%--        <span th:each="page: ${#numbers.sequence(0, reports.getTotalPages() - 1)}">--%>
-<%--            <li class="page-item"><a class="page-link" th:a="'?page=' + ${page}" th:text="${page + 1}"></a></li>--%>
-<%--        </span>--%>
-<%--        </ul>--%>
-<%--    </nav>--%>
+    <%@ include file="../fragments/paggination.jsp" %>
+
 </div>
 
 <%@ include file="../fragments/footer.jsp" %>

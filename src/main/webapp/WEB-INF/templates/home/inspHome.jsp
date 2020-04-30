@@ -69,6 +69,7 @@
             </td>
             <td>
                 <form action="${pageContext.request.contextPath}/app/inspHome/accept/${report.getId()}" method="post">
+                    <input id="csrfToken" name="csrfToken" type="hidden" value="${sessionScope.csrfToken}" />
                     <button type="submit" class="btn btn-success" onclick="return confirm('You sure?')">
                         <fmt:message key="string.accept" />
                     </button>
@@ -93,14 +94,7 @@
         <tbody>
     </table>
 
-<%--    <nav th:if="${reports.getTotalPages() != 0}" style="display: flex; justify-content: center"--%>
-<%--         aria-label="Page navigation example">--%>
-<%--        <ul class="pagination">--%>
-<%--        <span th:each="page: ${#numbers.sequence(0, reports.getTotalPages() - 1)}">--%>
-<%--            <li class="page-item"><a class="page-link" th:href="'?page=' + ${page}" th:text="${page + 1}"></a></li>--%>
-<%--        </span>--%>
-<%--        </ul>--%>
-<%--    </nav>--%>
+    <%@ include file="../fragments/paggination.jsp" %>
 </div>
 
 <%@ include file="../fragments/footer.jsp" %>

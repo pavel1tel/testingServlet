@@ -36,7 +36,7 @@ public class AuthFilter implements Filter {
                 response.sendError(403);
             }
         }
-        if(!pr.isAbleToAccess(request, role)) {
+        if(!pr.isAbleToAccess(request, response, role)) {
             request.getRequestDispatcher("/WEB-INF/templates/denied.jsp").forward(request, servletResponse);
             return;
         }

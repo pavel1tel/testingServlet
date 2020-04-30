@@ -35,7 +35,7 @@ public class JDBCReportDAO implements ReportDAO {
                 .owner(User.builder().id(2L).build())
                 .inspectors(new ArrayList<User>(Arrays.asList(User.builder().id(2L).build())))
                 .build();
-        reportDAO.delete(18L);
+        System.out.println(reportDAO.findById(12L));
     }
 
     public static Report extractReport(ResultSet rs) throws SQLException {
@@ -160,7 +160,6 @@ public class JDBCReportDAO implements ReportDAO {
                 ResultSet rs = ps.executeQuery();
                 rs.next();
                 id = rs.getInt("AUTO_INCREMENT") - 1;
-                System.out.println(id);
             } catch (SQLException ignored) {
                 throw new RuntimeException();
             }
@@ -266,7 +265,6 @@ public class JDBCReportDAO implements ReportDAO {
                 IntStream.range(0, parameters - 1).forEachOrdered(ignored -> query.append("(?, ?), "));
             }
             query.append("(?, ?);");
-            System.out.println(query.toString());
             try {
                 PreparedStatement ps = connection.prepareStatement(query.toString());
                 AtomicInteger counter = new AtomicInteger(1);
@@ -290,16 +288,16 @@ public class JDBCReportDAO implements ReportDAO {
             }
         }
         try (PreparedStatement ps = connection.prepareStatement
-                ("Update reports set status = ?, updated = ?, name = ?, description = ?, decline_reason = ?, owner_id = ? " +
+                ("Update reports set status = ?, updated = ?, name = ?, description = ?, decline_reason = ?" +
                         "where id = ?")) {
             ps.setString(1, entity.getStatus().name());
             ps.setString(2, LocalDate.now().toString());
-            System.out.println(entity.getName());
             ps.setString(3, entity.getName());
             ps.setString(4, entity.getDescription());
             ps.setString(5, entity.getDeclineReason());
-            ps.setLong(6, entity.getOwner().getId());
-            ps.setLong(7, entity.getId());
+            //todo owner is always null when getting from db!!!!!!!!!!
+            //ps.setLong(6, entity.getOwner().getId());
+            ps.setLong(6, entity.getId());
             ps.executeUpdate();
             ps.close();
             connection.commit();
