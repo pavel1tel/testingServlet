@@ -3,10 +3,7 @@ package com.kpi.testing.controller;
 import com.kpi.testing.controller.command.*;
 import com.kpi.testing.controller.command.get.*;
 import com.kpi.testing.controller.command.get.UserHomeCommand;
-import com.kpi.testing.controller.command.post.PostAddCommand;
-import com.kpi.testing.controller.command.post.PostLoginCommand;
-import com.kpi.testing.controller.command.post.PostRegistrationCommand;
-import com.kpi.testing.controller.command.post.PostUpdateCommand;
+import com.kpi.testing.controller.command.post.*;
 import com.kpi.testing.service.ReportService;
 import com.kpi.testing.service.UserService;
 
@@ -42,6 +39,7 @@ public class Servlet extends HttpServlet {
         postCommands.put("accounts/registration", new PostRegistrationCommand(userService));
         postCommands.put("userHome/add", new PostAddCommand(reportService, userService));
         postCommands.put("userHome/update/[1-9]*", new PostUpdateCommand(reportService));
+        postCommands.put("userHome/change/[1-9]*", new PostChangeInspector(reportService,userService));
 
     }
 

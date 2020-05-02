@@ -94,7 +94,7 @@
                 <c:if test="${report.getStatus().name() == 'NOT_ACCEPTED'}">
                     <td>
                         <form action="${pageContext.request.contextPath}/app/userHome/update/${report.getId()}" method="get">
-                            <button type="submit" class="btn btn-warning" onclick="return confirm('You sure?')">
+                            <button type="submit" class="btn btn-warning">
                                 <fmt:message key="string.correct" />
                             </button>
                     </form>
@@ -102,7 +102,7 @@
                 </c:if>
                 <c:if test="${report.getStatus().name() == 'NOT_ACCEPTED'}">
                     <td>
-                        <form action="'${pageContext.request.contextPath}/app/userHome/change/${report.getId()}" method="post">
+                        <form action="${pageContext.request.contextPath}/app/userHome/change/${report.getId()}" method="post">
                             <input id="csrfToken" name="csrfToken" type="hidden" value="${sessionScope.csrfToken}" />
                             <button type="submit" class="btn btn-danger" onclick="return confirm('You sure?')">
                                 <fmt:message key="string.replace" />

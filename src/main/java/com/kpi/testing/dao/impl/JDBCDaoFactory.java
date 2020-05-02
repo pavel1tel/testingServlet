@@ -1,5 +1,6 @@
 package com.kpi.testing.dao.impl;
 
+import com.kpi.testing.dao.ArchiveDAO;
 import com.kpi.testing.dao.DaoFactory;
 import com.kpi.testing.dao.ReportDAO;
 import com.kpi.testing.dao.UserDAO;
@@ -17,6 +18,13 @@ public class JDBCDaoFactory extends DaoFactory {
     public ReportDAO createReportDao() {
         return new JDBCReportDAO(getConnection());
     }
+
+    @Override
+    public ArchiveDAO createArchiveDao() {
+        return new JDBCArchiveDAO(getConnection());
+    }
+
+
 
     private Connection getConnection(){
         try {

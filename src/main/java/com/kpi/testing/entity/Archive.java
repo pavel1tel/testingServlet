@@ -7,11 +7,14 @@ public class Archive extends BaseEntity{
 
     private User inspectorDecision;
     private Report report;
+    private String name;
+    private String description;
     private String declineReason;
 
-    public Archive(User inspectorDecision, Report report, String declineReason) {
+    public Archive(User inspectorDecision, Report report, String description, String declineReason) {
         this.inspectorDecision = inspectorDecision;
         this.report = report;
+        this.description = description;
         this.declineReason = declineReason;
     }
 
@@ -27,6 +30,21 @@ public class Archive extends BaseEntity{
         public Builder inspectorDecision(User inspectorDecision){
             Archive.this.setInspectorDecision(inspectorDecision);
             return this;
+        }
+
+        public Archive.Builder id(Long id) {
+            Archive.this.setId(id);
+            return this;
+        }
+
+        public Builder description(String description){
+            Archive.this.setDescription(description);
+            return  this;
+        }
+
+        public Builder name(String name){
+            Archive.this.setName(name);
+            return  this;
         }
 
         public Builder report(Report report){
@@ -76,5 +94,33 @@ public class Archive extends BaseEntity{
 
     public void setDeclineReason(String declineReason) {
         this.declineReason = declineReason;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    @Override
+    public String toString() {
+        return "Archive{" +
+                "id=" + getId() +
+                "  inspectorDecision=" + inspectorDecision +
+                ", report=" + report +
+                ", name='" + name + '\'' +
+                ", description='" + description + '\'' +
+                ", declineReason='" + declineReason + '\'' +
+                '}';
     }
 }

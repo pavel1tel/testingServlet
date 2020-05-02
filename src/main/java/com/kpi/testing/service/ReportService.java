@@ -64,7 +64,7 @@ public class ReportService {
 
     private static List<User> getRandomElements(List<User> list) {
         Collections.shuffle(list);
-        int listSizeIndex = 2;
+        int listSizeIndex = list.size();
         return list.subList(0, listSizeIndex);
     }
 
@@ -82,5 +82,14 @@ public class ReportService {
 
     public Report getById(Long id) throws UnknownReportError {
         return reportDAO.findById(id).orElseThrow(UnknownReportError::new);
+    }
+
+    public void changeInspector(Report report) throws SQLException {
+        List<User> inspectors = report.getInspectors();
+        //todo
+        inspectors.remove(0);
+        report.setStatus(ReportStatus.QUEUE);
+        report.setInspectors(getRandomElements(inspectors));
+        reportDAO.update(report);
     }
 }
