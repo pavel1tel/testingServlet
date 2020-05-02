@@ -5,7 +5,7 @@ import com.kpi.testing.dao.DaoFactory;
 import com.kpi.testing.entity.Archive;
 import com.kpi.testing.entity.Report;
 import com.kpi.testing.entity.User;
-import com.kpi.testing.entity.enums.ReportStatus;
+
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;

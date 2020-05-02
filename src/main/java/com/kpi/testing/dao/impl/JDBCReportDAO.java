@@ -5,7 +5,6 @@ import com.kpi.testing.dao.ReportDAO;
 import com.kpi.testing.entity.Report;
 import com.kpi.testing.entity.User;
 import com.kpi.testing.entity.enums.ReportStatus;
-import org.omg.SendingContext.RunTime;
 
 import java.sql.*;
 import java.time.LocalDate;
@@ -22,7 +21,7 @@ public class JDBCReportDAO implements ReportDAO {
         this.connection = connection;
     }
 
-    public static void main(String[] args) throws SQLException {
+    public static void main(String[] args) {
         DaoFactory factory = JDBCDaoFactory.getInstance();
         ReportDAO reportDAO = factory.createReportDao();
         Report report = Report.builder()
@@ -56,11 +55,6 @@ public class JDBCReportDAO implements ReportDAO {
 
     private boolean isUniqUser(Map<Long, User> users, User user) {
         return !users.containsKey(user.getId());
-    }
-
-    private User makeUniqueUser(Map<Long, User> users, User user) {
-        users.putIfAbsent(user.getId(), user);
-        return users.get(user.getId());
     }
 
     private Report makeUniqueReport(Map<Long, Report> reports, Report report) {
@@ -138,7 +132,6 @@ public class JDBCReportDAO implements ReportDAO {
             ps.setString(7, LocalDate.now().toString());
             ps.executeUpdate();
         } catch (SQLException throwables) {
-            System.out.println(throwables);
             try {
                 connection.rollback();
             } catch (SQLException ignored) {

@@ -9,7 +9,6 @@ import com.kpi.testing.entity.enums.Status;
 import java.sql.*;
 import java.time.LocalDate;
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class JDBCUserDAO implements UserDAO {
     private final Connection connection;

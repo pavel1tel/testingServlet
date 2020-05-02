@@ -14,7 +14,6 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 
 public class Servlet extends HttpServlet {
     private final Map<String, Command> getCommands = new HashMap<>();
@@ -33,12 +32,13 @@ public class Servlet extends HttpServlet {
         getCommands.put("userHome", new UserHomeCommand(reportService, userService));
         getCommands.put("inspHome", new InspHomeCommand(reportService, userService));
         getCommands.put("userHome/add", new AddCommand());
-        getCommands.put("userHome/update/[1-9]*", new UpdateCommand(reportService));
+        getCommands.put("userHome/update/[1-9]*", new UpdateCommand(reportService, userService));
+        getCommands.put("inspHome/decline/[1-9]*", new DeclineCommand(reportService, userService));
 
         postCommands.put("accounts/login", new PostLoginCommand(userService));
         postCommands.put("accounts/registration", new PostRegistrationCommand(userService));
         postCommands.put("userHome/add", new PostAddCommand(reportService, userService));
-        postCommands.put("userHome/update/[1-9]*", new PostUpdateCommand(reportService));
+        postCommands.put("userHome/update/[1-9]*", new PostUpdateCommand(reportService, userService));
         postCommands.put("userHome/change/[1-9]*", new PostChangeInspector(reportService,userService));
 
     }
