@@ -28,7 +28,7 @@
     <h1>
         <fmt:message key="string.decline.reason"/>
     </h1>
-    <form method="post" action="${pageContext.request.contextPath}/app/inspHome/${report_id}}">
+    <form method="post" action="${pageContext.request.contextPath}/app/inspHome/decline/${report_id}">
         <input id="csrfToken" name="csrfToken" type="hidden" value="${sessionScope.csrfToken}" />
         <div class="form-group">
             <label for="declineReason">

@@ -4,21 +4,21 @@ import javax.validation.constraints.NotNull;
 
 public class DeclineReasonDTO {
     @NotNull
-    private String reason;
+    private String declineReason;
 
-    public DeclineReasonDTO(String reason) {
-        this.reason = reason;
+    public DeclineReasonDTO(String declineReason) {
+        this.declineReason = declineReason;
     }
 
     public DeclineReasonDTO() {
     }
 
-    public String getReason() {
-        return reason;
+    public String getDeclineReason() {
+        return declineReason;
     }
 
-    public void setReason(String reason) {
-        this.reason = reason;
+    public void setDeclineReason(String declineReason) {
+        this.declineReason = declineReason;
     }
 }
 

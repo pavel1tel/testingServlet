@@ -44,7 +44,7 @@ public class PostChangeInspector implements Command {
             Report reportToChange = reportService.getById(reportId);
             reportService.changeInspector(reportToChange);
             response.sendRedirect(request.getContextPath()+"/app" + "/userHome");
-        } catch (UnknownReportError | SQLException error) {
+        } catch (UnknownReportError error) {
             throw new RuntimeException();
         }
     }

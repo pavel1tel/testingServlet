@@ -2,6 +2,8 @@ package com.kpi.testing.dao;
 
 import com.kpi.testing.dao.impl.JDBCDaoFactory;
 
+import java.sql.Connection;
+
 public abstract class DaoFactory {
     private static DaoFactory daoFactory;
 

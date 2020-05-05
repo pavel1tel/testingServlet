@@ -1,5 +1,7 @@
 package com.kpi.testing.entity;
 
+import com.kpi.testing.entity.enums.ReportStatus;
+
 import java.time.LocalDate;
 import java.util.List;
 
@@ -10,12 +12,14 @@ public class Archive extends BaseEntity{
     private String name;
     private String description;
     private String declineReason;
+    private ReportStatus status;
 
-    public Archive(User inspectorDecision, Report report, String description, String declineReason) {
+    public Archive(User inspectorDecision, Report report, String description, String declineReason, ReportStatus status) {
         this.inspectorDecision = inspectorDecision;
         this.report = report;
         this.description = description;
         this.declineReason = declineReason;
+        this.status = status;
     }
 
     public Archive(){}
@@ -29,6 +33,11 @@ public class Archive extends BaseEntity{
 
         public Builder inspectorDecision(User inspectorDecision){
             Archive.this.setInspectorDecision(inspectorDecision);
+            return this;
+        }
+
+        public Builder status(ReportStatus status){
+            Archive.this.setStatus(status);
             return this;
         }
 
@@ -110,6 +119,14 @@ public class Archive extends BaseEntity{
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public ReportStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(ReportStatus status) {
+        this.status = status;
     }
 
     @Override

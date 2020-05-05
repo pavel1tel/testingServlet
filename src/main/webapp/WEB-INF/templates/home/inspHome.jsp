@@ -5,6 +5,8 @@
 <%@ page pageEncoding="UTF-8" %>
 <fmt:setLocale value="${sessionScope.locale}"/>
 <fmt:setBundle basename="messages"/>
+<fmt:message key="string.search" var="search_place"/>
+
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -19,6 +21,8 @@
             integrity="sha256-WpOohJOqMqqyKL9FccASB9O0KwACQJpFTUBLTYOVvVU="
             crossorigin="anonymous"></script>
     <script src="${pageContext.request.contextPath}/static/js/tableToggle.js"></script>
+    <script src="${pageContext.request.contextPath}/static/js/search.js"></script>
+
 
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
@@ -28,6 +32,7 @@
 <%@ include file="../fragments/navbar.jsp" %>
 
 <div class="content">
+    <%@ include file="../fragments/search.jsp" %>
     <table class="table-condensed table table-hover" style="border-collapse:collapse;">
         <caption>
             <fmt:message key="string.reports.list"/>

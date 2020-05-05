@@ -5,6 +5,7 @@ import com.kpi.testing.dao.DaoFactory;
 import com.kpi.testing.entity.Archive;
 import com.kpi.testing.entity.Report;
 import com.kpi.testing.entity.User;
+import com.kpi.testing.entity.enums.ReportStatus;
 
 
 import java.sql.Connection;
@@ -33,6 +34,7 @@ public class JDBCArchiveDAO implements ArchiveDAO {
                     .declineReason(rs.getString("archive.decline_reason"))
                     .description(rs.getString("archive.description"))
                     .name(rs.getString("archive.name"))
+                    .status(ReportStatus.valueOf(rs.getString("archive.status")))
                     .build();
         } catch (NullPointerException ignored) {
             return new Archive();
@@ -72,24 +74,29 @@ public class JDBCArchiveDAO implements ArchiveDAO {
             return archive;
         } catch (SQLException exception) {
             exception.printStackTrace();
+
         }
+
         return Optional.empty();
     }
 
     @Override
     public void create(Archive entity) {
         try (PreparedStatement ps = connection.prepareStatement("INSERT INTO archive" +
-                "(inspector_decision_id, report_id, description, name, decline_reason, created, updated)" +
-                " values(?, ?, ?, ?, ?, ?, ?)")) {
+                "(inspector_decision_id, report_id, description, name, decline_reason, status, created, updated)" +
+                " values(?, ?, ?, ?, ?, ?, ?, ?)")) {
             ps.setLong(1, entity.getInspectorDecision().getId());
             ps.setLong(2, entity.getReport().getId());
             ps.setString(3, entity.getDescription());
             ps.setString(4, entity.getName());
             ps.setString(5, entity.getDeclineReason());
-            ps.setString(6, LocalDate.now().toString());
+            ps.setString(6, entity.getStatus().name());
             ps.setString(7, LocalDate.now().toString());
+            ps.setString(8, LocalDate.now().toString());
             ps.executeUpdate();
+
         } catch (SQLException exeption) {
+
             throw new RuntimeException();
         }
     }
@@ -112,8 +119,10 @@ public class JDBCArchiveDAO implements ArchiveDAO {
             }
             return archive;
         } catch (SQLException exception) {
+
             exception.printStackTrace();
         }
+
         return Optional.empty();
     }
 
@@ -134,29 +143,33 @@ public class JDBCArchiveDAO implements ArchiveDAO {
             }
             return result;
         } catch (SQLException exception) {
+
             exception.printStackTrace();
         }
+
         return result;
     }
 
     @Override
     public void update(Archive entity) {
         try (PreparedStatement ps = connection.prepareStatement
-                ("Update archive set name = ?, description = ?, decline_reason = ?, inspector_decision_id = ?," +
+                ("Update archive set name = ?, description = ?, decline_reason = ?, status = ?, inspector_decision_id = ?," +
                         " report_id = ?, updated = ?" +
                         "where id = ?")) {
             ps.setString(1, entity.getName());
             ps.setString(2, entity.getDescription());
             ps.setString(3, entity.getDeclineReason());
-            ps.setLong(4, entity.getInspectorDecision().getId());
-            ps.setLong(5, entity.getReport().getId());
-            ps.setString(6, LocalDate.now().toString());
-            ps.setLong(7, entity.getId());
+            ps.setString(4, entity.getStatus().name());
+            ps.setLong(5, entity.getInspectorDecision().getId());
+            ps.setLong(6, entity.getReport().getId());
+            ps.setString(7, LocalDate.now().toString());
+            ps.setLong(8, entity.getId());
             ps.executeUpdate();
         } catch (SQLException throwables) {
-            throwables.printStackTrace();
+
             throw new RuntimeException();
         }
+
     }
 
     @Override
@@ -165,16 +178,18 @@ public class JDBCArchiveDAO implements ArchiveDAO {
             ps.setLong(1, id);
             ResultSet rs = ps.executeQuery();
         } catch (SQLException exception) {
+
             exception.printStackTrace();
         }
+
     }
 
     @Override
-    public void close() throws Exception {
+    public void close(){
         try {
             connection.close();
         } catch (SQLException e) {
-            throw new Exception(e);
+            throw new RuntimeException(e);
         }
     }
 }

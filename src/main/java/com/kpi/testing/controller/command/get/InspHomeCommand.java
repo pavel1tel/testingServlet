@@ -39,7 +39,8 @@ public class InspHomeCommand implements Command {
                 }
                 int limit = 12;
                 User user = userService.findById(userId);
-                List<ReportForInspectorReportTableDTO> reports = reportService.getAllByInspectorAndStatusForTable(user, ReportStatus.QUEUE);
+                String search = Optional.ofNullable(request.getParameter("search")).orElse("_");
+                List<ReportForInspectorReportTableDTO> reports = reportService.getAllByInspectorAndStatusForTable(user, ReportStatus.QUEUE, search);
                 Pagination<ReportForInspectorReportTableDTO> pagination = new Pagination<>(limit, reports);
                 reports.sort(Comparator.comparing(ReportForInspectorReportTableDTO::getId));
                 reports = pagination.getPage(page);

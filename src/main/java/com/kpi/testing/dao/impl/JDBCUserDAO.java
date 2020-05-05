@@ -62,8 +62,9 @@ public class JDBCUserDAO implements UserDAO {
                     user.orElse(new User()).getReportsOwned().add(report);
                 }
             }
+
         } catch (SQLException throwables) {
-            throwables.printStackTrace();
+
             throw new RuntimeException();
         }
         return user;
@@ -121,7 +122,9 @@ public class JDBCUserDAO implements UserDAO {
                     user.orElse(new User()).getReportsOwned().add(report);
                 }
             }
+
         } catch (SQLException throwables) {
+
             throwables.printStackTrace();
             throw new RuntimeException();
         }
@@ -158,7 +161,9 @@ public class JDBCUserDAO implements UserDAO {
                 }
             }
             result = new ArrayList<>(users.values());
+
         } catch (SQLException throwables) {
+
             throwables.printStackTrace();
             throw new RuntimeException();
         }
@@ -179,7 +184,9 @@ public class JDBCUserDAO implements UserDAO {
             ps.setString(6, LocalDate.now().toString());
             ps.setString(7, LocalDate.now().toString());
             ps.executeUpdate();
+
         } catch (SQLException exeption) {
+
             throw new RuntimeException();
         }
     }
@@ -213,9 +220,11 @@ public class JDBCUserDAO implements UserDAO {
                 }
             }
         } catch (SQLException throwables) {
+
             throwables.printStackTrace();
             throw new RuntimeException();
         }
+
         return user;
     }
 
@@ -254,7 +263,9 @@ public class JDBCUserDAO implements UserDAO {
                 }
             }
             result = new ArrayList<>(users.values());
+
         } catch (SQLException throwables) {
+
             throwables.printStackTrace();
             throw new RuntimeException();
         }
@@ -274,7 +285,9 @@ public class JDBCUserDAO implements UserDAO {
             ps.setString(7, LocalDate.now().toString());
             ps.setLong(8, entity.getId());
             ps.executeUpdate();
+
         } catch (SQLException throwables) {
+
             throwables.printStackTrace();
             throw new RuntimeException();
         }
@@ -285,18 +298,20 @@ public class JDBCUserDAO implements UserDAO {
         try (PreparedStatement ps = connection.prepareStatement("Update usr set status = 'Deleted' where id = ?")) {
             ps.setLong(1, id);
             ps.executeUpdate();
+
         } catch (SQLException throwables) {
+
             throwables.printStackTrace();
             throw new RuntimeException();
         }
     }
 
     @Override
-    public void close() throws Exception {
+    public void close() {
         try {
             connection.close();
         } catch (SQLException e) {
-            throw new Exception(e);
+            throw new RuntimeException(e);
         }
     }
 }

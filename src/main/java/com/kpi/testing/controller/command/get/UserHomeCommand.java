@@ -39,7 +39,8 @@ public class UserHomeCommand implements Command {
                 }
                 int limit = 12;
                 User user = userService.findById(userId);
-                List<ReportForUserReportTableDTO> reports = reportService.getAllByUserForUserTable(user);
+                String search = Optional.ofNullable(request.getParameter("search")).orElse("_");
+                List<ReportForUserReportTableDTO> reports = reportService.getAllByUserForUserTable(user, search);
                 Pagination<ReportForUserReportTableDTO>  pagination = new Pagination<>(limit, reports);
                 reports.sort(Comparator
                         .comparing(ReportForUserReportTableDTO::getUpdated)

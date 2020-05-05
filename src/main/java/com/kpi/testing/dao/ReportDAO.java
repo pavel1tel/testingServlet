@@ -8,6 +8,6 @@ import java.util.List;
 import java.util.Optional;
 
 public interface ReportDAO extends BaseDAO<Report>{
-    List<Report> findByOwner(User user);
-    List<Report> findAllByInspectorsAndStatus(User inspector, ReportStatus status);
+    List<Report> findByOwnerWhereNameLike(User user, String name);
+    List<Report> findAllByInspectorsAndStatusWhereNameLike(User inspector, ReportStatus status, String name);
 }

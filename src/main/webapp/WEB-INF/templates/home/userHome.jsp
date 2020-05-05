@@ -6,6 +6,8 @@
 <%@ page pageEncoding="UTF-8"%>
 <fmt:setLocale value="${sessionScope.locale}" />
 <fmt:setBundle basename="messages"/>
+<fmt:message key="string.search" var="search_place"/>
+
 
 
 <html lang="en">
@@ -17,7 +19,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/static/css/login.css">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/static/css/userPage.css">
-
+    <script src="${pageContext.request.contextPath}/static/js/search.js"></script>
     <script
             src="https://code.jquery.com/jquery-3.4.1.js"
             integrity="sha256-WpOohJOqMqqyKL9FccASB9O0KwACQJpFTUBLTYOVvVU="
@@ -30,6 +32,7 @@
 <body>
 <%@ include file="../fragments/navbar.jsp" %>
 <div class="content">
+    <%@ include file="../fragments/search.jsp" %>
 
     <table class="table-condensed table table-hover" style="border-collapse:collapse;">
         <caption>
