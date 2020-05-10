@@ -21,7 +21,7 @@ public class LocaleFilter implements Filter{
         final HttpServletRequest request = (HttpServletRequest) servletRequest;
         HttpSession session = request.getSession();
 
-        String lang= request.getParameter("lang");
+        String lang = request.getParameter("lang");
         if (lang == null){
             setDefaultsIfMissing(session);
         } else {
@@ -30,14 +30,14 @@ public class LocaleFilter implements Filter{
         filterChain.doFilter(servletRequest, servletResponse);
     }
 
-    private void setDefaultsIfMissing(HttpSession session) {
+    public void setDefaultsIfMissing(HttpSession session) {
         String langCode = (String) session.getAttribute(CURRENT_LANGUAGE);
         if (langCode == null) {
             setLocale(session, "en");
         }
     }
 
-    private void setLocale(HttpSession session, String langCode) {
+    public void setLocale(HttpSession session, String langCode) {
         Locale locale = new Locale(langCode);
         session.setAttribute(CURRENT_LANGUAGE, locale.getLanguage());
     }

@@ -1,6 +1,7 @@
 package com.kpi.testing.dto;
 
 import javax.validation.constraints.NotNull;
+import java.util.Objects;
 
 public class UpdateReportDTO {
 
@@ -53,5 +54,21 @@ public class UpdateReportDTO {
 
     public void setDeclineReason(String declineReason) {
         this.declineReason = declineReason;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        UpdateReportDTO that = (UpdateReportDTO) o;
+        return id.equals(that.id) &&
+                name.equals(that.name) &&
+                description.equals(that.description) &&
+                Objects.equals(declineReason, that.declineReason);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, name, description, declineReason);
     }
 }

@@ -5,6 +5,7 @@ import com.kpi.testing.entity.enums.ReportStatus;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class Report extends BaseEntity{
     private String name;
@@ -23,19 +24,6 @@ public class Report extends BaseEntity{
         this.inspectors = inspectors;
         this.archives = archives;
         this.declineReason = declineReason;
-    }
-
-    @Override
-    public String toString() {
-        return "Report{" +
-                "name='" + name + '\'' +
-                ", description='" + description + '\'' +
-                ", status=" + status +
-                ", owner=" + owner +
-                ", inspectors=" + inspectors +
-                ", declineReason='" + declineReason + '\'' +
-                ", archives=" + archives +
-                '}';
     }
 
     public Report() {}
@@ -156,5 +144,24 @@ public class Report extends BaseEntity{
 
     public void setArchives(List<Archive> archives) {
         this.archives = archives;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Report report = (Report) o;
+        return name.equals(report.name) &&
+                description.equals(report.description) &&
+                status == report.status &&
+                owner.equals(report.owner) &&
+                inspectors.equals(report.inspectors) &&
+                Objects.equals(declineReason, report.declineReason) &&
+                Objects.equals(archives, report.archives);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name, description, status, owner, inspectors, declineReason, archives);
     }
 }

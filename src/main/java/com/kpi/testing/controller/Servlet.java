@@ -4,6 +4,8 @@ import com.kpi.testing.controller.command.*;
 import com.kpi.testing.controller.command.get.*;
 import com.kpi.testing.controller.command.get.UserHomeCommand;
 import com.kpi.testing.controller.command.post.*;
+import com.kpi.testing.service.InspectorService;
+import com.kpi.testing.service.ReportOwnerService;
 import com.kpi.testing.service.ReportService;
 import com.kpi.testing.service.UserService;
 
@@ -24,6 +26,8 @@ public class Servlet extends HttpServlet {
         super.init();
         UserService userService = new UserService();
         ReportService reportService = new ReportService();
+        ReportOwnerService reportOwnerService = new ReportOwnerService();
+        InspectorService inspectorService = new InspectorService();
         getCommands.put("accounts/login", new LoginCommand());
         getCommands.put("index", new IndexCommand(userService));
         getCommands.put("error", new ErrorCommand());
@@ -39,17 +43,17 @@ public class Servlet extends HttpServlet {
         postCommands.put("accounts/registration", new PostRegistrationCommand(userService));
         postCommands.put("userHome/add", new PostAddCommand(reportService, userService));
         postCommands.put("userHome/update/[0-9]*", new PostUpdateCommand(reportService, userService));
-        postCommands.put("userHome/change/[0-9]*", new PostChangeInspector(reportService,userService));
-        postCommands.put("inspHome/decline/[0-9]*", new PostDeclineCommand(reportService,userService));
-        postCommands.put("inspHome/accept/[0-9]*", new PostAcceptCommand(reportService,userService));
+        postCommands.put("userHome/change/[0-9]*", new PostChangeInspector(reportService,userService, reportOwnerService));
+        postCommands.put("inspHome/decline/[0-9]*", new PostDeclineCommand(reportService,userService, inspectorService));
+        postCommands.put("inspHome/accept/[0-9]*", new PostAcceptCommand(reportService,userService, inspectorService));
 
     }
 
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    public void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         processRequest(request, response, postCommands);
     }
 
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         processRequest(request, response, getCommands);
     }
 

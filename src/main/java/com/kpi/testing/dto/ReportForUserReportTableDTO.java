@@ -5,6 +5,7 @@ import com.kpi.testing.entity.enums.ReportStatus;
 
 import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
+import java.util.Objects;
 
 public class ReportForUserReportTableDTO {
     @NotNull
@@ -34,7 +35,6 @@ public class ReportForUserReportTableDTO {
 
     public ReportForUserReportTableDTO() {
     }
-
 
 
     public String getId() {
@@ -91,5 +91,24 @@ public class ReportForUserReportTableDTO {
 
     public void setDeclineReason(String reason) {
         this.declineReason = reason;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ReportForUserReportTableDTO that = (ReportForUserReportTableDTO) o;
+        return id.equals(that.id) &&
+                name.equals(that.name) &&
+                description.equals(that.description) &&
+                status == that.status &&
+                created.equals(that.created) &&
+                updated.equals(that.updated) &&
+                Objects.equals(declineReason, that.declineReason);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, name, description, status, created, updated, declineReason);
     }
 }

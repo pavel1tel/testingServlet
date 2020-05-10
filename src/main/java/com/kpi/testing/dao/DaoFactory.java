@@ -1,8 +1,7 @@
 package com.kpi.testing.dao;
 
 import com.kpi.testing.dao.impl.JDBCDaoFactory;
-
-import java.sql.Connection;
+import com.kpi.testing.dao.impl.JDBCSqlExecutor;
 
 public abstract class DaoFactory {
     private static DaoFactory daoFactory;
@@ -10,6 +9,9 @@ public abstract class DaoFactory {
     public abstract UserDAO createUserDao();
     public abstract ReportDAO createReportDao();
     public abstract ArchiveDAO createArchiveDao();
+    public abstract void setProp(String name);
+    public abstract JDBCSqlExecutor createExecutor();
+
 
     public static DaoFactory getInstance(){
         if (daoFactory == null) {

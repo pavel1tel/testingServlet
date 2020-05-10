@@ -2,6 +2,7 @@ package com.kpi.testing.dto;
 
 import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
+import java.util.Objects;
 
 public class ReportForInspectorReportTableDTO {
     @NotNull
@@ -64,5 +65,22 @@ public class ReportForInspectorReportTableDTO {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ReportForInspectorReportTableDTO that = (ReportForInspectorReportTableDTO) o;
+        return id.equals(that.id) &&
+                Name.equals(that.Name) &&
+                created.equals(that.created) &&
+                updated.equals(that.updated) &&
+                description.equals(that.description);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, Name, created, updated, description);
     }
 }

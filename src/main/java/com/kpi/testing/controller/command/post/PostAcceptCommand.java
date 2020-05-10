@@ -1,10 +1,10 @@
 package com.kpi.testing.controller.command.post;
 
 import com.kpi.testing.controller.command.Command;
-import com.kpi.testing.dto.DeclineReasonDTO;
 import com.kpi.testing.entity.Report;
 import com.kpi.testing.entity.User;
 import com.kpi.testing.exceptions.UnknownReportError;
+import com.kpi.testing.service.InspectorService;
 import com.kpi.testing.service.ReportService;
 import com.kpi.testing.service.UserService;
 
@@ -17,10 +17,12 @@ import java.sql.SQLException;
 public class PostAcceptCommand implements Command {
     private final ReportService reportService;
     private  final UserService userService;
+    private final InspectorService inspectorService;
 
-    public PostAcceptCommand(ReportService reportService, UserService userService) {
+    public PostAcceptCommand(ReportService reportService, UserService userService, InspectorService inspectorService) {
         this.reportService = reportService;
         this.userService = userService;
+        this.inspectorService = inspectorService;
     }
 
     @Override
@@ -42,7 +44,7 @@ public class PostAcceptCommand implements Command {
         try {
             Report report = reportService.getById(reportId);
             try {
-                reportService.acceptReport(report, user);
+                inspectorService.acceptReport(report, user);
             } catch (SQLException exception) {
                 exception.printStackTrace();
                 throw new RuntimeException();

@@ -6,6 +6,7 @@ import com.kpi.testing.dto.UpdateReportDTO;
 import com.kpi.testing.entity.Report;
 import com.kpi.testing.entity.User;
 import com.kpi.testing.exceptions.UnknownReportError;
+import com.kpi.testing.service.InspectorService;
 import com.kpi.testing.service.ReportService;
 import com.kpi.testing.service.UserService;
 
@@ -19,10 +20,12 @@ public class PostDeclineCommand implements Command {
 
     private final ReportService reportService;
     private  final UserService userService;
+    private final InspectorService inspectorService;
 
-    public PostDeclineCommand(ReportService reportService, UserService userService) {
+    public PostDeclineCommand(ReportService reportService, UserService userService, InspectorService inspectorService) {
         this.reportService = reportService;
         this.userService = userService;
+        this.inspectorService = inspectorService;
     }
 
     @Override
@@ -45,7 +48,7 @@ public class PostDeclineCommand implements Command {
             Report report = reportService.getById(reportId);
             DeclineReasonDTO declineReasonDTO = new DeclineReasonDTO(request.getParameter("declineReason"));
             try {
-                reportService.declineReport(report, declineReasonDTO, user);
+                inspectorService.declineReport(report, declineReasonDTO, user);
             } catch (SQLException exception) {
                 throw new RuntimeException();
             }

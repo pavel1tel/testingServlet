@@ -5,6 +5,8 @@ import com.kpi.testing.dto.UpdateReportDTO;
 import com.kpi.testing.entity.Report;
 import com.kpi.testing.entity.User;
 import com.kpi.testing.exceptions.UnknownReportError;
+import com.kpi.testing.service.InspectorService;
+import com.kpi.testing.service.ReportOwnerService;
 import com.kpi.testing.service.ReportService;
 import com.kpi.testing.service.UserService;
 
@@ -18,10 +20,12 @@ public class PostChangeInspector implements Command {
 
     private final ReportService reportService;
     private final UserService userService;
+    private final ReportOwnerService reportOwnerService;
 
-    public PostChangeInspector(ReportService reportService, UserService userService) {
+    public PostChangeInspector(ReportService reportService, UserService userService, ReportOwnerService reportOwnerService) {
         this.reportService = reportService;
         this.userService = userService;
+        this.reportOwnerService = reportOwnerService;
     }
 
     @Override
@@ -42,7 +46,7 @@ public class PostChangeInspector implements Command {
         }
         try {
             Report reportToChange = reportService.getById(reportId);
-            reportService.changeInspector(reportToChange);
+            reportOwnerService.changeInspector(reportToChange);
             response.sendRedirect(request.getContextPath()+"/app" + "/userHome");
         } catch (UnknownReportError error) {
             throw new RuntimeException();
