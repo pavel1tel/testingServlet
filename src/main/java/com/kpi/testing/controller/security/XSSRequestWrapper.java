@@ -2,6 +2,7 @@ package com.kpi.testing.controller.security;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
+import java.text.Normalizer;
 
 public class XSSRequestWrapper extends HttpServletRequestWrapper {
     public XSSRequestWrapper(HttpServletRequest request) {
@@ -38,12 +39,14 @@ public class XSSRequestWrapper extends HttpServletRequestWrapper {
     }
 
     private String cleanXSS(String value) {
+        String s = Normalizer.normalize(value, Normalizer.Form.NFKC);
+        s = s.replaceAll("[\\p{Cn}]", "\uFFFD");
         value = value.replaceAll("<", "&lt;").replaceAll(">", "&gt;");
         value = value.replaceAll("\\(", "&#40;").replaceAll("\\)", "&#41;");
         value = value.replaceAll("'", "&#39;");
         value = value.replaceAll("eval\\((.*)\\)", "");
-        value = value.replaceAll("[\\\"\\\'][\\s]*javascript:(.*)[\\\"\\\']", "\"\"");
-        value = value.replaceAll("script", "");
+        value = value.replaceAll("[\"'][\\s]*javascript:(.*)[\"']", "\"\"");
+        //value = value.replaceAll("script", "");
         return value;
     }
 

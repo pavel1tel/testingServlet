@@ -8,6 +8,8 @@ import com.kpi.testing.service.InspectorService;
 import com.kpi.testing.service.ReportOwnerService;
 import com.kpi.testing.service.ReportService;
 import com.kpi.testing.service.UserService;
+import org.slf4j.Logger;
+import static org.slf4j.LoggerFactory.getLogger;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -20,10 +22,14 @@ import java.util.Map;
 public class Servlet extends HttpServlet {
     private final Map<String, Command> getCommands = new HashMap<>();
     private final Map<String, Command> postCommands = new HashMap<>();
+    private static final org.slf4j.Logger logger = org.slf4j.LoggerFactory.getLogger(Servlet.class);
 
     @Override
     public void init() throws ServletException {
         super.init();
+        System.setProperty("org.slf4j.simpleLogger.showDateTime","true");
+        System.setProperty("org.slf4j.simpleLogger.defaultLogLevel","info");
+        System.setProperty("org.slf4j.simpleLogger.dateTimeFormat", "yyyy-MM-dd::HH-mm-ss-SSS");
         UserService userService = new UserService();
         ReportService reportService = new ReportService();
         ReportOwnerService reportOwnerService = new ReportOwnerService();
@@ -63,6 +69,7 @@ public class Servlet extends HttpServlet {
         path = path.replaceAll(".*/app/" , "");
         String match = commands.keySet().stream().filter(path::matches).findFirst().orElse("error");
         Command command = commands.getOrDefault(match , new ErrorCommand());
+        logger.info("URI: " + path +" is redirected to: " + command.getClass().getSimpleName() + " command");
         command.execute(request, response);
     }
 }

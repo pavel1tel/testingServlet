@@ -5,16 +5,19 @@ import com.kpi.testing.entity.User;
 import com.kpi.testing.entity.enums.Role;
 import com.kpi.testing.exceptions.UsernameNotFoundException;
 import com.kpi.testing.service.UserService;
+import org.slf4j.Logger;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 import java.io.IOException;
+
+import static org.slf4j.LoggerFactory.getLogger;
 
 public class IndexCommand implements Command {
 
     UserService userService;
+    private static final Logger logger = getLogger(IndexCommand.class);
 
     public IndexCommand(UserService userService) {
         this.userService = userService;
@@ -34,7 +37,7 @@ public class IndexCommand implements Command {
                     request.getSession().setAttribute("homeUrl", request.getContextPath() + "/app/inspHome");
                 }
             } catch (UsernameNotFoundException ex) {
-                ex.printStackTrace();
+                logger.error("INVALID user recorded in session");
                 return;
             }
         }

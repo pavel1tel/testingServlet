@@ -37,15 +37,14 @@ public class JDBCUserDAO implements UserDAO {
     @Override
     public Optional<User> findByUsername(String username) {
         Optional<User> user;
-        try (Statement ps = connection.createStatement()) {
-            ResultSet rs1 = ps.executeQuery(
-                    String.format("SELECT *  FROM usr " +
-                            "left join report_inspectors " +
-                            "on usr.id = usr_id " +
-                            "left join reports " +
-                            "on usr.id = reports.owner_id or reports.id = report_id " +
-                            "where username='%s'", username)
-            );
+        try (PreparedStatement ps = connection.prepareStatement("SELECT *  FROM usr " +
+                "left join report_inspectors " +
+                "on usr.id = usr_id " +
+                "left join reports " +
+                "on usr.id = reports.owner_id or reports.id = report_id " +
+                "where username=?")) {
+            ps.setString(1, username);
+            ResultSet rs1 = ps.executeQuery();
             user = getNewUser(rs1);
             Map<Long, Report> reportsOwned = new HashMap<>();
             Map<Long, Report> reportsInspected = new HashMap<>();
@@ -63,25 +62,10 @@ public class JDBCUserDAO implements UserDAO {
                 }
             }
 
-        } catch (SQLException throwables) {
-
-            throw new RuntimeException();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
         }
         return user;
-    }
-
-    public static void main(String[] args) throws SQLException {
-        JDBCDaoFactory factory = new JDBCDaoFactory();
-        UserDAO userDAO = factory.createUserDao();
-        User user = User.builder().username("updated")
-                .email("pawloiwanov@gmail.com")
-                .role(Role.ROLE_INSPECTOR)
-                .status(Status.Active)
-                .password("pass")
-                .created(LocalDate.now())
-                .id(3L)
-                .build();
-        System.out.println(userDAO.findById(1L));
     }
 
     private boolean isUniqReport(Map<Long, Report> reports, Report report) {
@@ -97,15 +81,15 @@ public class JDBCUserDAO implements UserDAO {
     @Override
     public Optional<User> findByEmail(String email) {
         Optional<User> user;
-        try (Statement ps = connection.createStatement()) {
-            ResultSet rs1 = ps.executeQuery(
-                    String.format("SELECT *  FROM usr " +
-                            "left join report_inspectors " +
-                            "on usr.id = usr_id " +
-                            "left join reports " +
-                            "on usr.id = reports.owner_id or reports.id = report_id " +
-                            "where email='%s'", email)
-            );
+        try (PreparedStatement ps = connection.prepareStatement(
+                "SELECT *  FROM usr " +
+                "left join report_inspectors " +
+                "on usr.id = usr_id " +
+                "left join reports " +
+                "on usr.id = reports.owner_id or reports.id = report_id " +
+                "where email=? ")) {
+            ps.setString(1, email);
+            ResultSet rs1 = ps.executeQuery();
             user = getNewUser(rs1);
             Map<Long, Report> reportsOwned = new HashMap<>();
             Map<Long, Report> reportsInspected = new HashMap<>();
@@ -123,10 +107,8 @@ public class JDBCUserDAO implements UserDAO {
                 }
             }
 
-        } catch (SQLException throwables) {
-
-            throwables.printStackTrace();
-            throw new RuntimeException();
+        } catch (SQLException exception) {
+            throw new RuntimeException(exception);
         }
         return user;
     }
@@ -134,15 +116,15 @@ public class JDBCUserDAO implements UserDAO {
     @Override
     public List<User> findAllByRole(Role role) {
         List<User> result;
-        try (Statement ps = connection.createStatement()) {
-            ResultSet rs1 = ps.executeQuery(
-                    String.format("SELECT *  FROM usr " +
-                            "left join report_inspectors " +
-                            "on usr.id = usr_id " +
-                            "left join reports " +
-                            "on usr.id = reports.owner_id or reports.id = report_id " +
-                            "where usr.role = '%s'", role.name())
-            );
+        try (PreparedStatement ps = connection.prepareStatement(
+                "SELECT *  FROM usr " +
+                "left join report_inspectors " +
+                "on usr.id = usr_id " +
+                "left join reports " +
+                "on usr.id = reports.owner_id or reports.id = report_id " +
+                "where usr.role = ?")) {
+            ps.setString(1, role.name());
+            ResultSet rs1 = ps.executeQuery();
             Map<Long, Report> reportsOwned = new HashMap<>();
             Map<Long, User> users = new HashMap<>();
             Map<Long, Report> reportsInspected = new HashMap<>();
@@ -162,10 +144,8 @@ public class JDBCUserDAO implements UserDAO {
             }
             result = new ArrayList<>(users.values());
 
-        } catch (SQLException throwables) {
-
-            throwables.printStackTrace();
-            throw new RuntimeException();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
         }
         return result;
     }
@@ -185,24 +165,22 @@ public class JDBCUserDAO implements UserDAO {
             ps.setString(7, LocalDate.now().toString());
             ps.executeUpdate();
 
-        } catch (SQLException exeption) {
-
-            throw new RuntimeException();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
         }
     }
 
     @Override
     public Optional<User> findById(Long id) {
         Optional<User> user;
-        try (Statement ps = connection.createStatement()) {
-            ResultSet rs1 = ps.executeQuery(
-                    String.format("SELECT *  FROM usr " +
-                            "left join report_inspectors " +
-                            "on usr.id = usr_id " +
-                            "left join reports " +
-                            "on usr.id = reports.owner_id or reports.id = report_id " +
-                            "where usr.id='%s'", id)
-            );
+        try (PreparedStatement ps = connection.prepareStatement("SELECT *  FROM usr " +
+                "left join report_inspectors " +
+                "on usr.id = usr_id " +
+                "left join reports " +
+                "on usr.id = reports.owner_id or reports.id = report_id " +
+                "where usr.id=?")) {
+            ps.setLong(1, id);
+            ResultSet rs1 = ps.executeQuery();
             user = getNewUser(rs1);
             Map<Long, Report> reportsOwned = new HashMap<>();
             Map<Long, Report> reportsInspected = new HashMap<>();
@@ -219,10 +197,8 @@ public class JDBCUserDAO implements UserDAO {
                     user.orElse(new User()).getReportsOwned().add(report);
                 }
             }
-        } catch (SQLException throwables) {
-
-            throwables.printStackTrace();
-            throw new RuntimeException();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
         }
 
         return user;
@@ -264,10 +240,8 @@ public class JDBCUserDAO implements UserDAO {
             }
             result = new ArrayList<>(users.values());
 
-        } catch (SQLException throwables) {
-
-            throwables.printStackTrace();
-            throw new RuntimeException();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
         }
         return result;
     }
@@ -286,10 +260,8 @@ public class JDBCUserDAO implements UserDAO {
             ps.setLong(8, entity.getId());
             ps.executeUpdate();
 
-        } catch (SQLException throwables) {
-
-            throwables.printStackTrace();
-            throw new RuntimeException();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
         }
     }
 
@@ -299,10 +271,8 @@ public class JDBCUserDAO implements UserDAO {
             ps.setLong(1, id);
             ps.executeUpdate();
 
-        } catch (SQLException throwables) {
-
-            throwables.printStackTrace();
-            throw new RuntimeException();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
         }
     }
 

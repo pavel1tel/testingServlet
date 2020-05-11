@@ -21,22 +21,6 @@ public class JDBCReportDAO implements ReportDAO {
         this.connection = connection;
     }
 
-    public static void main(String[] args) {
-        DaoFactory factory = JDBCDaoFactory.getInstance();
-        ReportDAO reportDAO = factory.createReportDao();
-        Report report = Report.builder()
-                .created(LocalDate.now())
-                .updated(LocalDate.now())
-                .name("itWorks!")
-                .description("itWorks!")
-                .declineReason(null)
-                .status(ReportStatus.NOT_ACCEPTED)
-                .owner(User.builder().id(2L).build())
-                .inspectors(new ArrayList<User>(Arrays.asList(User.builder().id(2L).build())))
-                .build();
-        System.out.println(reportDAO.findById(12L));
-    }
-
     public static Report extractReport(ResultSet rs) throws SQLException {
         try {
             return Report.builder()
@@ -65,14 +49,15 @@ public class JDBCReportDAO implements ReportDAO {
     @Override
     public List<Report> findByOwnerWhereNameLike(User user, String name) {
         List<Report> result;
-        try (Statement ps = connection.createStatement()) {
-            ResultSet rs1 = ps.executeQuery(
-                    String.format("select * from reports" +
-                            " left join report_inspectors" +
-                            " on reports.id = report_inspectors.report_id" +
-                            " left join usr on usr.id = usr_id" +
-                            " where owner_id = %d and name like '%%%s%%'", user.getId(), name)
-            );
+        try (PreparedStatement ps = connection.prepareStatement(
+                "select * from reports" +
+                " left join report_inspectors" +
+                " on reports.id = report_inspectors.report_id" +
+                " left join usr on usr.id = usr_id" +
+                " where owner_id = ? and name like ?")) {
+            ps.setLong(1, user.getId());
+            ps.setString(2, "%" + name + "%");
+            ResultSet rs1 = ps.executeQuery();
             Map<Long, User> inspectors = new HashMap<>();
             Map<Long, Report> reports = new HashMap<>();
             while (rs1.next()) {
@@ -87,10 +72,8 @@ public class JDBCReportDAO implements ReportDAO {
             }
             result = new ArrayList<>(reports.values());
 
-        } catch (SQLException throwables) {
-
-            throwables.printStackTrace();
-            throw new RuntimeException();
+        } catch (SQLException exception) {
+            throw new RuntimeException(exception);
         }
 
         return result;
@@ -99,22 +82,23 @@ public class JDBCReportDAO implements ReportDAO {
     @Override
     public List<Report> findAllByInspectorsAndStatusWhereNameLike(User inspector, ReportStatus status, String name) {
         List<Report> result;
-        try (Statement ps = connection.createStatement()) {
-            ResultSet rs1 = ps.executeQuery(
-                    String.format("select * from report_inspectors" +
-                            " left join reports" +
-                            " on report_inspectors.report_id = reports.id" +
-                            " where usr_id = %d and reports.status = '%s'" +
-                            " and reports.name like '%%%s%%'", inspector.getId(), status.name(), name)
-            );
+        try (PreparedStatement ps = connection.prepareStatement(
+                "select * from report_inspectors" +
+                " left join reports" +
+                " on report_inspectors.report_id = reports.id" +
+                " where usr_id = ? and reports.status = ?" +
+                " and reports.name like ?")) {
+            ps.setLong(1, inspector.getId());
+            ps.setString(2, status.name());
+            ps.setString(3, "%" + name + "%");
+            ResultSet rs1 = ps.executeQuery();
             Map<Long, Report> reports = new HashMap<>();
             while (rs1.next()) {
                 makeUniqueReport(reports, extractReport(rs1));
             }
             result = new ArrayList<>(reports.values());
-        } catch (SQLException throwables) {
-
-            throw new RuntimeException();
+        } catch (SQLException exception) {
+            throw new RuntimeException(exception);
         }
 
         return result;
@@ -136,15 +120,13 @@ public class JDBCReportDAO implements ReportDAO {
             ps.setLong(6, entity.getOwner().getId());
             ps.setString(7, LocalDate.now().toString());
             ps.executeUpdate();
-        } catch (SQLException throwables) {
+        } catch (SQLException exception) {
             try {
                 connection.rollback();
-            } catch (SQLException ignored) {
-
-                throw new RuntimeException();
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
             }
-
-            throw new RuntimeException();
+            throw new RuntimeException(exception);
         }
         if (parameters > 0) {
             StringBuffer query = new StringBuffer("insert into report_inspectors (usr_id, report_id) values ");
@@ -160,9 +142,8 @@ public class JDBCReportDAO implements ReportDAO {
                 ResultSet rs = ps.executeQuery();
                 rs.next();
                 id = rs.getInt("AUTO_INCREMENT") - 1;
-            } catch (SQLException ignored) {
-
-                throw new RuntimeException();
+            } catch (SQLException exception) {
+                throw new RuntimeException(exception);
             }
             try {
                 PreparedStatement ps = connection.prepareStatement(query.toString());
@@ -181,12 +162,11 @@ public class JDBCReportDAO implements ReportDAO {
             } catch (SQLException exception) {
                 try {
                     connection.rollback();
-                } catch (SQLException ignored) {
-
-                    throw new RuntimeException();
+                } catch (SQLException e) {
+                    throw new RuntimeException(e);
                 }
 
-                throw new RuntimeException();
+                throw new RuntimeException(exception);
             }
         }
 
@@ -195,14 +175,14 @@ public class JDBCReportDAO implements ReportDAO {
     @Override
     public Optional<Report> findById(Long id) {
         Optional<Report> report;
-        try (Statement ps = connection.createStatement()) {
-            ResultSet rs1 = ps.executeQuery(
-                    String.format("select * from reports" +
-                            " left join report_inspectors" +
-                            " on reports.id = report_inspectors.report_id" +
-                            " left join usr on usr.id = usr_id" +
-                            " where reports.id = %d", id)
-            );
+        try (PreparedStatement ps = connection.prepareStatement(
+                "select * from reports" +
+                " left join report_inspectors" +
+                " on reports.id = report_inspectors.report_id" +
+                " left join usr on usr.id = usr_id" +
+                " where reports.id = ?")) {
+            ps.setLong(1, id);
+            ResultSet rs1 = ps.executeQuery();
             report = (rs1.next()) ? Optional.of(extractReport(rs1)) : Optional.empty();
             rs1.previous();
             Map<Long, User> inspectors = new HashMap<>();
@@ -214,12 +194,9 @@ public class JDBCReportDAO implements ReportDAO {
                     report.orElse(new Report()).getInspectors().add(inspector);
                 }
             }
-        } catch (SQLException throwables) {
-
-            throwables.printStackTrace();
-            throw new RuntimeException();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
         }
-
         return report;
     }
 
@@ -245,11 +222,9 @@ public class JDBCReportDAO implements ReportDAO {
                 }
             }
             result = new ArrayList<>(reports.values());
-        } catch (SQLException throwables) {
-
-            throw new RuntimeException();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
         }
-
         return result;
     }
 
@@ -262,9 +237,8 @@ public class JDBCReportDAO implements ReportDAO {
             ps.setLong(1, entity.getId());
             ps.executeUpdate();
             ps.close();
-        } catch (SQLException ignored){
-
-            throw new RuntimeException();
+        } catch (SQLException e){
+            throw new RuntimeException(e);
         }
         if (parameters > 0) {
             StringBuffer query = new StringBuffer("insert into report_inspectors (usr_id, report_id) values ");
@@ -280,7 +254,7 @@ public class JDBCReportDAO implements ReportDAO {
                         ps.setLong(counter.getAndIncrement(), entity.getInspectors().get(i).getId());
                         ps.setLong(counter.getAndIncrement(), entity.getId());
                     } catch (SQLException exception) {
-                        exception.printStackTrace();
+                        throw new RuntimeException(exception);
                     }
                 });
                 ps.executeUpdate();
@@ -292,7 +266,6 @@ public class JDBCReportDAO implements ReportDAO {
 
                     throw new RuntimeException();
                 }
-
                 throw new RuntimeException();
             }
         }
@@ -310,15 +283,13 @@ public class JDBCReportDAO implements ReportDAO {
             ps.executeUpdate();
             ps.close();
             connection.commit();
-        } catch (SQLException throwables) {
+        } catch (SQLException throwable) {
             try {
                 connection.rollback();
-            } catch (SQLException ignored) {
-
-                throw new RuntimeException();
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
             }
-
-            throw new RuntimeException();
+            throw new RuntimeException(throwable);
         }
 
     }
@@ -332,12 +303,10 @@ public class JDBCReportDAO implements ReportDAO {
         } catch (SQLException exception) {
             try {
                 connection.rollback();
-            } catch (SQLException ignored){
-
-                throw new RuntimeException();
+            } catch (SQLException e){
+                throw new RuntimeException(e);
             }
-
-            throw new RuntimeException();
+            throw new RuntimeException(exception);
         }
         try(PreparedStatement ps = connection.prepareStatement("delete from archive where report_id = ?")){
             ps.setLong(1, id);
@@ -360,13 +329,10 @@ public class JDBCReportDAO implements ReportDAO {
         } catch (SQLException exception) {
             try {
                 connection.rollback();
-
-            } catch (SQLException ignored){
-
-                throw new RuntimeException();
+            } catch (SQLException e){
+                throw new RuntimeException(e);
             }
-
-            throw new RuntimeException();
+            throw new RuntimeException(exception);
         }
 
     }

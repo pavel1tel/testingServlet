@@ -2,13 +2,13 @@ package com.kpi.testing.controller.command.get;
 
 import com.kpi.testing.controller.command.Command;
 import com.kpi.testing.dto.ReportForInspectorReportTableDTO;
-import com.kpi.testing.dto.ReportForUserReportTableDTO;
 import com.kpi.testing.entity.User;
 import com.kpi.testing.entity.enums.ReportStatus;
 import com.kpi.testing.exceptions.UsernameNotFoundException;
 import com.kpi.testing.service.ReportService;
 import com.kpi.testing.service.UserService;
 import com.kpi.testing.util.Pagination;
+import org.slf4j.Logger;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -18,9 +18,12 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
+import static org.slf4j.LoggerFactory.getLogger;
+
 public class InspHomeCommand implements Command {
     private final ReportService reportService;
     private final UserService userService;
+    private static final Logger logger = getLogger(InspHomeCommand.class);
 
     public InspHomeCommand(ReportService reportService, UserService userService) {
         this.reportService = reportService;
@@ -48,6 +51,7 @@ public class InspHomeCommand implements Command {
                 request.setAttribute("totalPages", pagination.getTotalPages());
                 request.getRequestDispatcher("/WEB-INF/templates/home/inspHome.jsp").forward(request, response);
             } catch (UsernameNotFoundException ex) {
+                logger.error("Report with specified id not found");
                 response.sendError(403);
             }
         } else {

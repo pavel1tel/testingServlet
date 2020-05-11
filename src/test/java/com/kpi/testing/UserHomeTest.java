@@ -107,20 +107,20 @@ public class UserHomeTest {
 
     @Test
     public void getUpdateReport() throws ServletException, IOException, UnknownReportError {
-        when(request.getRequestURI()).thenReturn("/app/userHome/update/1");
+        when(request.getRequestURI()).thenReturn("/app/userHome/update/3");
         when(request.getSession().getAttribute("loggedIn")).thenReturn("true");
         when(request.getSession().getAttribute("user")).thenReturn("1");
         when(request.getRequestDispatcher("/WEB-INF/templates/home/updateReport.jsp")).thenReturn(dispatcher);
 
         servlet.doGet(request, response);
-        UpdateReportDTO report = reportService.getForUpdate(1L);
+        UpdateReportDTO report = reportService.getForUpdate(3L);
         verify(request, times(1)).setAttribute("report", report);
         verify(request, times(1)).getRequestDispatcher("/WEB-INF/templates/home/updateReport.jsp");
     }
 
     @Test
     public void postUpdateReport() throws ServletException, IOException, UnknownReportError {
-        when(request.getRequestURI()).thenReturn("/app/userHome/update/1");
+        when(request.getRequestURI()).thenReturn("/app/userHome/update/3");
         when(request.getSession().getAttribute("loggedIn")).thenReturn("true");
         when(request.getSession().getAttribute("user")).thenReturn("1");
         when(request.getRequestDispatcher("/WEB-INF/templates/home/updateReport.jsp")).thenReturn(dispatcher);
@@ -130,7 +130,7 @@ public class UserHomeTest {
 
         servlet.doPost(request, response);
 
-        Report updated = reportService.getById(1L);
+        Report updated = reportService.getById(3L);
         Assert.assertEquals("updated", updated.getName());
         Assert.assertEquals("updated description", updated.getDescription());
 

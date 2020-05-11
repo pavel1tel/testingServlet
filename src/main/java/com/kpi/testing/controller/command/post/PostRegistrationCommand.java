@@ -5,7 +5,6 @@ import com.kpi.testing.entity.User;
 import com.kpi.testing.exceptions.InvalidUserException;
 import com.kpi.testing.exceptions.UserExistsException;
 import com.kpi.testing.service.UserService;
-import com.kpi.testing.validators.NewUserValidator;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;

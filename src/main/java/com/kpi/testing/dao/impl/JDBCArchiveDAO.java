@@ -41,21 +41,6 @@ public class JDBCArchiveDAO implements ArchiveDAO {
         }
     }
 
-    public static void main(String[] args) {
-        Report report = Report.builder().id(21L).build();
-        User user = User.builder().id(4L).build();
-        Archive archive = Archive.builder()
-                .id(5L)
-                .declineReason("up")
-                .description("upd")
-                .name("upn")
-                .inspectorDecision(user)
-                .report(report).build();
-        DaoFactory factory = new JDBCDaoFactory();
-        ArchiveDAO archiveDAO = factory.createArchiveDao();
-        archiveDAO.update(archive);
-    }
-
     @Override
     public  Optional<Archive> findLastByReport(Report report) {
         try(PreparedStatement ps = connection.prepareStatement("SELECT * FROM archive" +
@@ -72,9 +57,7 @@ public class JDBCArchiveDAO implements ArchiveDAO {
                 archive.get().setReport(report);
             }
             return archive;
-        } catch (SQLException exception) {
-            exception.printStackTrace();
-
+        } catch (SQLException ignored) {
         }
 
         return Optional.empty();
@@ -95,9 +78,8 @@ public class JDBCArchiveDAO implements ArchiveDAO {
             ps.setString(8, LocalDate.now().toString());
             ps.executeUpdate();
 
-        } catch (SQLException exeption) {
-
-            throw new RuntimeException();
+        } catch (SQLException exception) {
+            throw new RuntimeException(exception);
         }
     }
 
@@ -118,9 +100,7 @@ public class JDBCArchiveDAO implements ArchiveDAO {
                 archive.get().setReport(report);
             }
             return archive;
-        } catch (SQLException exception) {
-
-            exception.printStackTrace();
+        } catch (SQLException ignored) {
         }
 
         return Optional.empty();
@@ -142,9 +122,7 @@ public class JDBCArchiveDAO implements ArchiveDAO {
                 result.add(archive);
             }
             return result;
-        } catch (SQLException exception) {
-
-            exception.printStackTrace();
+        } catch (SQLException ignored) {
         }
 
         return result;
@@ -165,9 +143,8 @@ public class JDBCArchiveDAO implements ArchiveDAO {
             ps.setString(7, LocalDate.now().toString());
             ps.setLong(8, entity.getId());
             ps.executeUpdate();
-        } catch (SQLException throwables) {
-
-            throw new RuntimeException();
+        } catch (SQLException exception) {
+            throw new RuntimeException(exception);
         }
 
     }
@@ -178,8 +155,7 @@ public class JDBCArchiveDAO implements ArchiveDAO {
             ps.setLong(1, id);
             ResultSet rs = ps.executeQuery();
         } catch (SQLException exception) {
-
-            exception.printStackTrace();
+            throw new RuntimeException(exception);
         }
 
     }

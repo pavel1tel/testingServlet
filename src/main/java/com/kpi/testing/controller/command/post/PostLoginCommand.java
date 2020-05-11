@@ -24,7 +24,6 @@ public class PostLoginCommand implements Command {
 
     @Override
     public void execute(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        //todo logout and new login
         if(request.getSession().getAttribute("user") == null) {
             HttpSession session = request.getSession();
             User user;
@@ -39,7 +38,7 @@ public class PostLoginCommand implements Command {
                 if(user.getStatus().equals(Status.Deleted)){
                     response.sendRedirect(request.getContextPath() + "/app" + "/accounts/login?error=true");
                 }
-                String sessionID = authorizationInterceptor.createSession(session, user, rememberMe);
+                authorizationInterceptor.createSession(session, user, rememberMe);
             } catch (UsernameNotFoundException | InvalidUserException e) {
                 response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                 response.sendRedirect(request.getContextPath() + "/app" + "/accounts/login?error=true");

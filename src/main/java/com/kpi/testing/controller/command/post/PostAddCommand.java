@@ -6,16 +6,20 @@ import com.kpi.testing.entity.User;
 import com.kpi.testing.exceptions.UsernameNotFoundException;
 import com.kpi.testing.service.ReportService;
 import com.kpi.testing.service.UserService;
+import org.slf4j.Logger;
 
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+
+import static org.slf4j.LoggerFactory.getLogger;
 
 public class PostAddCommand implements Command {
 
     private final ReportService reportService;
     private final UserService userService;
+    private static final Logger logger = getLogger(PostAddCommand.class);
+
 
     public PostAddCommand(ReportService reportService, UserService userService) {
         this.reportService = reportService;
@@ -23,7 +27,7 @@ public class PostAddCommand implements Command {
     }
 
     @Override
-    public void execute(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
+    public void execute(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String NAME_PARAM = "name";
         String name = request.getParameter(NAME_PARAM);
         String DESC_PARAM = "description";
@@ -35,8 +39,9 @@ public class PostAddCommand implements Command {
         try {
             User user = userService.findById(userId);
             reportService.save(report, user);
-            response.sendRedirect(request.getContextPath()+"/app" + "/userHome");
+            response.sendRedirect(request.getContextPath() + "/app" + "/userHome");
         } catch (UsernameNotFoundException ex) {
+            logger.error("INVALID user recorded in session");
             response.sendError(403);
         }
     }

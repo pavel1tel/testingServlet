@@ -31,7 +31,7 @@ public class InspectorService {
     }
 
     @Transactional
-    public void declineReport(Report reportToDecline, DeclineReasonDTO reportReason, User inspector) throws SQLException {
+    public void declineReport(Report reportToDecline, DeclineReasonDTO reportReason, User inspector) {
         Archive archive = Archive.builder()
                 .report(reportToDecline)
                 .inspectorDecision(inspector)
@@ -48,7 +48,7 @@ public class InspectorService {
     }
 
     @Transactional
-    public void acceptReport(Report reportToDecline, User inspector) throws SQLException {
+    public void acceptReport(Report reportToDecline, User inspector) {
         //todo dont work
         Archive archive = Archive.builder()
                 .report(reportToDecline)

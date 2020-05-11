@@ -75,7 +75,7 @@ public class ReportService {
         return modelMapper.map(report, UpdateReportDTO.class);
     }
 
-    public void update(Report report, UpdateReportDTO reportDTO) throws SQLException {
+    public void update(Report report, UpdateReportDTO reportDTO) {
         report.setName(reportDTO.getName());
         report.setDescription(reportDTO.getDescription());
         report.setStatus(ReportStatus.QUEUE);

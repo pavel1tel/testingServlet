@@ -1,16 +1,10 @@
 package com.kpi.testing.controller.security;
 
-import com.kpi.testing.entity.User;
 import com.kpi.testing.entity.enums.Role;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-import java.io.IOException;
 import java.util.*;
-import java.util.function.Supplier;
 
 public class PermissionResolver {
     private final Map<Role, Set<String>> permissions = new HashMap<>();
@@ -25,14 +19,14 @@ public class PermissionResolver {
         permissions.put(Role.ROLE_INSPECTOR, INSP_PAGES);
     }
 
-    public boolean isAbleToAccess (HttpServletRequest request, HttpServletResponse response, Role role) throws ServletException, IOException {
+    public boolean isAbleToAccess (HttpServletRequest request, HttpServletResponse response, Role role) {
 
         String path = request.getRequestURI();
         path = path.replaceAll(".*/app/" , "");
 
         String finalPath = path;
         if(permissions.values().stream().noneMatch(set -> set.stream().anyMatch(finalPath::matches))){
-            return true; //404 error Page Not Found;
+            return true; //404 error Page Not Found
         }
 
         if( COMMON_PAGES.stream().anyMatch(path::matches)){
