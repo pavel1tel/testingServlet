@@ -1,11 +1,11 @@
 package com.kpi.testing.dao.impl;
 
-import com.kpi.testing.dao.DaoFactory;
 import com.kpi.testing.dao.ReportDAO;
 import com.kpi.testing.entity.Report;
 import com.kpi.testing.entity.User;
 import com.kpi.testing.entity.enums.ReportStatus;
 
+import javax.sql.DataSource;
 import java.sql.*;
 import java.time.LocalDate;
 import java.util.*;
@@ -15,10 +15,10 @@ import java.util.stream.IntStream;
 import static com.kpi.testing.dao.impl.JDBCUserDAO.extractUser;
 
 public class JDBCReportDAO implements ReportDAO {
-    Connection connection;
+    DataSource ds;
 
-    public JDBCReportDAO(Connection connection) {
-        this.connection = connection;
+    public JDBCReportDAO(DataSource ds) {
+        this.ds = ds;
     }
 
     public static Report extractReport(ResultSet rs) throws SQLException {
@@ -49,40 +49,42 @@ public class JDBCReportDAO implements ReportDAO {
     @Override
     public List<Report> findByOwnerWhereNameLike(User user, String name) {
         List<Report> result;
-        try (PreparedStatement ps = connection.prepareStatement(
-                "select * from reports" +
-                " left join report_inspectors" +
-                " on reports.id = report_inspectors.report_id" +
-                " left join usr on usr.id = usr_id" +
-                " where owner_id = ? and name like ?")) {
-            ps.setLong(1, user.getId());
-            ps.setString(2, "%" + name + "%");
-            ResultSet rs1 = ps.executeQuery();
-            Map<Long, User> inspectors = new HashMap<>();
-            Map<Long, Report> reports = new HashMap<>();
-            while (rs1.next()) {
-                Report report = makeUniqueReport(reports, extractReport(rs1));
+            try (   Connection connection = ds.getConnection();
+                    PreparedStatement ps = connection.prepareStatement(
+                    "select * from reports" +
+                            " left join report_inspectors" +
+                            " on reports.id = report_inspectors.report_id" +
+                            " left join usr on usr.id = usr_id" +
+                            " where owner_id = ? and name like ?")) {
 
-                User inspector = extractUser(rs1);
-                if (isUniqUser(inspectors, inspector)
-                        && rs1.getLong("report_id") == rs1.getLong("reports.id")) {
-                    inspectors.putIfAbsent(report.getId(), inspector);
-                    report.getInspectors().add(inspector);
+                ps.setLong(1, user.getId());
+                ps.setString(2, "%" + name + "%");
+                ResultSet rs1 = ps.executeQuery();
+                Map<Long, User> inspectors = new HashMap<>();
+                Map<Long, Report> reports = new HashMap<>();
+                while (rs1.next()) {
+                    Report report = makeUniqueReport(reports, extractReport(rs1));
+
+                    User inspector = extractUser(rs1);
+                    if (isUniqUser(inspectors, inspector)
+                            && rs1.getLong("report_id") == rs1.getLong("reports.id")) {
+                        inspectors.putIfAbsent(report.getId(), inspector);
+                        report.getInspectors().add(inspector);
+                    }
                 }
+                result = new ArrayList<>(reports.values());
+
+            } catch (SQLException exception) {
+                throw new RuntimeException(exception);
             }
-            result = new ArrayList<>(reports.values());
-
-        } catch (SQLException exception) {
-            throw new RuntimeException(exception);
-        }
-
         return result;
     }
 
     @Override
     public List<Report> findAllByInspectorsAndStatusWhereNameLike(User inspector, ReportStatus status, String name) {
         List<Report> result;
-        try (PreparedStatement ps = connection.prepareStatement(
+        try (   Connection connection = ds.getConnection();
+                PreparedStatement ps = connection.prepareStatement(
                 "select * from report_inspectors" +
                 " left join reports" +
                 " on report_inspectors.report_id = reports.id" +
@@ -108,66 +110,70 @@ public class JDBCReportDAO implements ReportDAO {
     public void create(Report entity) {
         int parameters = entity.getInspectors().size();
         int id;
-        try (PreparedStatement ps = connection.prepareStatement
-                ("insert into reports (`status`, `updated`, `name`, `description`, `decline_reason`, `owner_id`, `created`) " +
-                        "VALUES(?, ?, ?, ?, ?, ?, ?)")) {
-            connection.setAutoCommit(false);
-            ps.setString(1, entity.getStatus().name());
-            ps.setString(2, LocalDate.now().toString());
-            ps.setString(3, entity.getName());
-            ps.setString(4, entity.getDescription());
-            ps.setString(5, entity.getDeclineReason());
-            ps.setLong(6, entity.getOwner().getId());
-            ps.setString(7, LocalDate.now().toString());
-            ps.executeUpdate();
-        } catch (SQLException exception) {
-            try {
-                connection.rollback();
-            } catch (SQLException e) {
-                throw new RuntimeException(e);
-            }
-            throw new RuntimeException(exception);
-        }
-        if (parameters > 0) {
-            StringBuffer query = new StringBuffer("insert into report_inspectors (usr_id, report_id) values ");
-            if (parameters > 1) {
-                IntStream.range(0, parameters - 1).forEachOrdered(ignored -> query.append("(?, ?), "));
-            }
-            query.append("(?, ?);");
-            try {
-                PreparedStatement ps = connection.prepareStatement("SELECT `AUTO_INCREMENT` " +
-                        "FROM  INFORMATION_SCHEMA.TABLES " +
-                        "WHERE TABLE_SCHEMA = 'testing' " +
-                        "AND   TABLE_NAME   = 'reports';");
-                ResultSet rs = ps.executeQuery();
-                rs.next();
-                id = rs.getInt("AUTO_INCREMENT") - 1;
-            } catch (SQLException exception) {
-                throw new RuntimeException(exception);
-            }
-            try {
-                PreparedStatement ps = connection.prepareStatement(query.toString());
-                AtomicInteger counter = new AtomicInteger(1);
-                IntStream.range(0, parameters).forEachOrdered(i -> {
-                    try {
-                        ps.setLong(counter.getAndIncrement(), entity.getInspectors().get(i).getId());
-                        ps.setLong(counter.getAndIncrement(), id);
-                    } catch (SQLException exception) {
-                        exception.printStackTrace();
-                    }
-                });
+        try(Connection connection = ds.getConnection()) {
+            try (PreparedStatement ps = connection.prepareStatement
+                    ("insert into reports (`status`, `updated`, `name`, `description`, `decline_reason`, `owner_id`, `created`) " +
+                            "VALUES(?, ?, ?, ?, ?, ?, ?)")) {
+                connection.setAutoCommit(false);
+                ps.setString(1, entity.getStatus().name());
+                ps.setString(2, LocalDate.now().toString());
+                ps.setString(3, entity.getName());
+                ps.setString(4, entity.getDescription());
+                ps.setString(5, entity.getDeclineReason());
+                ps.setLong(6, entity.getOwner().getId());
+                ps.setString(7, LocalDate.now().toString());
                 ps.executeUpdate();
-                ps.close();
-                connection.commit();
             } catch (SQLException exception) {
                 try {
                     connection.rollback();
                 } catch (SQLException e) {
                     throw new RuntimeException(e);
                 }
-
                 throw new RuntimeException(exception);
             }
+            if (parameters > 0) {
+                StringBuffer query = new StringBuffer("insert into report_inspectors (usr_id, report_id) values ");
+                if (parameters > 1) {
+                    IntStream.range(0, parameters - 1).forEachOrdered(ignored -> query.append("(?, ?), "));
+                }
+                query.append("(?, ?);");
+                try {
+                    PreparedStatement ps = connection.prepareStatement("SELECT `AUTO_INCREMENT` " +
+                            "FROM  INFORMATION_SCHEMA.TABLES " +
+                            "WHERE TABLE_SCHEMA = 'testing' " +
+                            "AND   TABLE_NAME   = 'reports';");
+                    ResultSet rs = ps.executeQuery();
+                    rs.next();
+                    id = rs.getInt("AUTO_INCREMENT") - 1;
+                } catch (SQLException exception) {
+                    throw new RuntimeException(exception);
+                }
+                try {
+                    PreparedStatement ps = connection.prepareStatement(query.toString());
+                    AtomicInteger counter = new AtomicInteger(1);
+                    IntStream.range(0, parameters).forEachOrdered(i -> {
+                        try {
+                            ps.setLong(counter.getAndIncrement(), entity.getInspectors().get(i).getId());
+                            ps.setLong(counter.getAndIncrement(), id);
+                        } catch (SQLException exception) {
+                            exception.printStackTrace();
+                        }
+                    });
+                    ps.executeUpdate();
+                    ps.close();
+                    connection.commit();
+                } catch (SQLException exception) {
+                    try {
+                        connection.rollback();
+                    } catch (SQLException e) {
+                        throw new RuntimeException(e);
+                    }
+
+                    throw new RuntimeException(exception);
+                }
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
         }
 
     }
@@ -175,7 +181,8 @@ public class JDBCReportDAO implements ReportDAO {
     @Override
     public Optional<Report> findById(Long id) {
         Optional<Report> report;
-        try (PreparedStatement ps = connection.prepareStatement(
+        try (   Connection connection = ds.getConnection();
+                PreparedStatement ps = connection.prepareStatement(
                 "select * from reports" +
                 " left join report_inspectors" +
                 " on reports.id = report_inspectors.report_id" +
@@ -203,7 +210,8 @@ public class JDBCReportDAO implements ReportDAO {
     @Override
     public List<Report> findAll() {
         List<Report> result;
-        try (Statement ps = connection.createStatement()) {
+        try (   Connection connection = ds.getConnection();
+                Statement ps = connection.createStatement()) {
             ResultSet rs1 = ps.executeQuery(
                     "select * from reports" +
                             " left join report_inspectors" +
@@ -231,116 +239,110 @@ public class JDBCReportDAO implements ReportDAO {
     @Override
     public void update(Report entity) {
         int parameters = entity.getInspectors().size();
-        try {
-            connection.setAutoCommit(false);
-            PreparedStatement ps = connection.prepareStatement("delete from report_inspectors where report_id = ?");
-            ps.setLong(1, entity.getId());
-            ps.executeUpdate();
-            ps.close();
-        } catch (SQLException e){
-            throw new RuntimeException(e);
-        }
-        if (parameters > 0) {
-            StringBuffer query = new StringBuffer("insert into report_inspectors (usr_id, report_id) values ");
-            if (parameters > 1) {
-                IntStream.range(0, parameters - 1).forEachOrdered(ignored -> query.append("(?, ?), "));
-            }
-            query.append("(?, ?);");
+        try(Connection connection = ds.getConnection()) {
             try {
-                PreparedStatement ps = connection.prepareStatement(query.toString());
-                AtomicInteger counter = new AtomicInteger(1);
-                IntStream.range(0, parameters).forEachOrdered(i -> {
-                    try {
-                        ps.setLong(counter.getAndIncrement(), entity.getInspectors().get(i).getId());
-                        ps.setLong(counter.getAndIncrement(), entity.getId());
-                    } catch (SQLException exception) {
-                        throw new RuntimeException(exception);
-                    }
-                });
+                connection.setAutoCommit(false);
+                PreparedStatement ps = connection.prepareStatement("delete from report_inspectors where report_id = ?");
+                ps.setLong(1, entity.getId());
                 ps.executeUpdate();
                 ps.close();
-            } catch (SQLException exception) {
-                try {
-                    connection.rollback();
-                } catch (SQLException ignored) {
-
-                    throw new RuntimeException();
-                }
-                throw new RuntimeException();
-            }
-        }
-        try (PreparedStatement ps = connection.prepareStatement
-                ("Update reports set status = ?, updated = ?, name = ?, description = ?, decline_reason = ? " +
-                        "where id = ?")) {
-            ps.setString(1, entity.getStatus().name());
-            ps.setString(2, LocalDate.now().toString());
-            ps.setString(3, entity.getName());
-            ps.setString(4, entity.getDescription());
-            ps.setString(5, entity.getDeclineReason());
-            //todo owner is always null when getting from db!!!!!!!!!!
-            //ps.setLong(6, entity.getOwner().getId());
-            ps.setLong(6, entity.getId());
-            ps.executeUpdate();
-            ps.close();
-            connection.commit();
-        } catch (SQLException throwable) {
-            try {
-                connection.rollback();
             } catch (SQLException e) {
                 throw new RuntimeException(e);
             }
-            throw new RuntimeException(throwable);
-        }
+            if (parameters > 0) {
+                StringBuffer query = new StringBuffer("insert into report_inspectors (usr_id, report_id) values ");
+                if (parameters > 1) {
+                    IntStream.range(0, parameters - 1).forEachOrdered(ignored -> query.append("(?, ?), "));
+                }
+                query.append("(?, ?);");
+                try {
+                    PreparedStatement ps = connection.prepareStatement(query.toString());
+                    AtomicInteger counter = new AtomicInteger(1);
+                    IntStream.range(0, parameters).forEachOrdered(i -> {
+                        try {
+                            ps.setLong(counter.getAndIncrement(), entity.getInspectors().get(i).getId());
+                            ps.setLong(counter.getAndIncrement(), entity.getId());
+                        } catch (SQLException exception) {
+                            throw new RuntimeException(exception);
+                        }
+                    });
+                    ps.executeUpdate();
+                    ps.close();
+                } catch (SQLException exception) {
+                    try {
+                        connection.rollback();
+                    } catch (SQLException ignored) {
 
+                        throw new RuntimeException();
+                    }
+                    throw new RuntimeException();
+                }
+            }
+            try (PreparedStatement ps = connection.prepareStatement
+                    ("Update reports set status = ?, updated = ?, name = ?, description = ?, decline_reason = ? " +
+                            "where id = ?")) {
+                ps.setString(1, entity.getStatus().name());
+                ps.setString(2, LocalDate.now().toString());
+                ps.setString(3, entity.getName());
+                ps.setString(4, entity.getDescription());
+                ps.setString(5, entity.getDeclineReason());
+                //todo owner is always null when getting from db!!!!!!!!!!
+                //ps.setLong(6, entity.getOwner().getId());
+                ps.setLong(6, entity.getId());
+                ps.executeUpdate();
+                ps.close();
+                connection.commit();
+            } catch (SQLException throwable) {
+                try {
+                    connection.rollback();
+                } catch (SQLException e) {
+                    throw new RuntimeException(e);
+                }
+                throw new RuntimeException(throwable);
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
     public void delete(Long id) {
-        try(PreparedStatement ps = connection.prepareStatement("delete from report_inspectors where report_id = ?")){
-            connection.setAutoCommit(false);
-            ps.setLong(1, id);
-            ps.executeUpdate();
-        } catch (SQLException exception) {
-            try {
-                connection.rollback();
-            } catch (SQLException e){
-                throw new RuntimeException(e);
+        try (Connection connection = ds.getConnection()) {
+            try (PreparedStatement ps = connection.prepareStatement("delete from report_inspectors where report_id = ?")) {
+                connection.setAutoCommit(false);
+                ps.setLong(1, id);
+                ps.executeUpdate();
+            } catch (SQLException exception) {
+                try {
+                    connection.rollback();
+                } catch (SQLException e) {
+                    throw new RuntimeException(e);
+                }
+                throw new RuntimeException(exception);
             }
-            throw new RuntimeException(exception);
-        }
-        try(PreparedStatement ps = connection.prepareStatement("delete from archive where report_id = ?")){
-            ps.setLong(1, id);
-            ps.executeUpdate();
-        } catch (SQLException exception) {
-            try {
-                connection.rollback();
-
-            } catch (SQLException ignored){
-
+            try (PreparedStatement ps = connection.prepareStatement("delete from archive where report_id = ?")) {
+                ps.setLong(1, id);
+                ps.executeUpdate();
+            } catch (SQLException exception) {
+                try {
+                    connection.rollback();
+                } catch (SQLException ignored) {
+                    throw new RuntimeException();
+                }
                 throw new RuntimeException();
             }
-
-            throw new RuntimeException();
-        }
-        try(PreparedStatement ps = connection.prepareStatement("delete from reports where id = ?")){
-            ps.setLong(1, id);
-            ps.executeUpdate();
-            connection.commit();
-        } catch (SQLException exception) {
-            try {
-                connection.rollback();
-            } catch (SQLException e){
-                throw new RuntimeException(e);
+            try (PreparedStatement ps = connection.prepareStatement("delete from reports where id = ?")) {
+                ps.setLong(1, id);
+                ps.executeUpdate();
+                connection.commit();
+            } catch (SQLException exception) {
+                try {
+                    connection.rollback();
+                } catch (SQLException e) {
+                    throw new RuntimeException(e);
+                }
+                throw new RuntimeException(exception);
             }
-            throw new RuntimeException(exception);
-        }
-
-    }
-
-    @Override
-    public void close() {
-        try {
-            connection.close();
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }

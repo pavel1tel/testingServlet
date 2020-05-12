@@ -3,6 +3,7 @@ package com.kpi.testing;
 import com.kpi.testing.controller.Servlet;
 import com.kpi.testing.dao.ArchiveDAO;
 import com.kpi.testing.dao.DaoFactory;
+import com.kpi.testing.dao.impl.DataSourceHolder;
 import com.kpi.testing.dao.impl.JDBCSqlExecutor;
 import com.kpi.testing.dto.ReportForInspectorReportTableDTO;
 import com.kpi.testing.entity.Archive;
@@ -51,8 +52,9 @@ public class InspectorHomeTest {
 
     public InspectorHomeTest() throws ServletException {
         MockitoAnnotations.initMocks(this);
+        DataSourceHolder dataSourceHolder = new DataSourceHolder();
+        dataSourceHolder.setProp("testDb.properties");
         DaoFactory factory = DaoFactory.getInstance();
-        factory.setProp("testDb.properties");
         archiveDAO = factory.createArchiveDao();
         reportService = new ReportService();
         userService = new UserService();

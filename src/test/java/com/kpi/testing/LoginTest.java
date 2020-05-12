@@ -3,6 +3,7 @@ package com.kpi.testing;
 import com.kpi.testing.controller.Servlet;
 import com.kpi.testing.controller.filters.AuthFilter;
 import com.kpi.testing.dao.DaoFactory;
+import com.kpi.testing.dao.impl.DataSourceHolder;
 import com.kpi.testing.dao.impl.JDBCDaoFactory;
 import com.kpi.testing.dao.impl.JDBCSqlExecutor;
 import org.junit.Before;
@@ -49,8 +50,9 @@ public class LoginTest {
 
     public LoginTest() throws ServletException {
         MockitoAnnotations.initMocks(this);
+        DataSourceHolder dataSourceHolder = new DataSourceHolder();
+        dataSourceHolder.setProp("testDb.properties");
         factory = DaoFactory.getInstance();
-        factory.setProp("testDb.properties");
         executor = factory.createExecutor();
         servlet.init();
         when(request.getSession()).thenReturn(session);
@@ -58,7 +60,6 @@ public class LoginTest {
 
     @BeforeEach
     public void createDb() throws FileNotFoundException {
-        factory.setProp("testDb.properties");
         executor.executeSql("src/test/resources/sql/create_user_before.sql");
         executor.executeSql("src/test/resources/sql/create_report_before.sql");
     }
@@ -82,21 +83,6 @@ public class LoginTest {
 
     }
 
-//    @Test
-//    public void getLoginPageLoggedIn() throws IOException, ServletException {
-//
-//        when(request.getRequestURI()).thenReturn("/app/accounts/login");
-//        when(request.getSession().getAttribute("loggedIn")).thenReturn("true");
-//        when(request.getSession().getAttribute("user")).thenReturn("1");
-//        when(request.getRequestDispatcher("/WEB-INF/templates/denied.jsp")).thenReturn(dispatcher);
-//        AuthFilter authFilter = new AuthFilter();
-//        authFilter.doFilter(request, response, filterChain);
-//
-//        verify(request, never()).getRequestDispatcher("/WEB-INF/templates/accounts/login.jsp");
-//        verify(request, times(1)).getRequestDispatcher("/WEB-INF/templates/denied.jsp");
-//        verify(dispatcher).forward(request, response);
-//
-//    }
 
     @Test
     public void postLogin() throws IOException, ServletException {

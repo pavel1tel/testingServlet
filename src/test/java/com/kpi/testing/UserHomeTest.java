@@ -3,6 +3,7 @@ package com.kpi.testing;
 import com.kpi.testing.controller.Servlet;
 import com.kpi.testing.dao.DaoFactory;
 import com.kpi.testing.dao.UserDAO;
+import com.kpi.testing.dao.impl.DataSourceHolder;
 import com.kpi.testing.dao.impl.JDBCSqlExecutor;
 import com.kpi.testing.dto.ReportForUserReportTableDTO;
 import com.kpi.testing.dto.UpdateReportDTO;
@@ -52,8 +53,9 @@ public class UserHomeTest {
 
     public UserHomeTest() throws ServletException {
         MockitoAnnotations.initMocks(this);
+        DataSourceHolder dataSourceHolder = new DataSourceHolder();
+        dataSourceHolder.setProp("testDb.properties");
         DaoFactory factory = DaoFactory.getInstance();
-        factory.setProp("testDb.properties");
         reportService = new ReportService();
         userService = new UserService();
         executor = factory.createExecutor();

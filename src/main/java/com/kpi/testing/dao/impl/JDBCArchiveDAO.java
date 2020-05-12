@@ -8,6 +8,7 @@ import com.kpi.testing.entity.User;
 import com.kpi.testing.entity.enums.ReportStatus;
 
 
+import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -19,10 +20,10 @@ import java.util.Optional;
 
 public class JDBCArchiveDAO implements ArchiveDAO {
 
-    Connection connection;
+    DataSource ds;
 
-    public JDBCArchiveDAO(Connection connection) {
-        this.connection = connection;
+    public JDBCArchiveDAO(DataSource ds) {
+        this.ds = ds;
     }
 
     public static Archive extractArchive(ResultSet rs) throws SQLException {
@@ -43,7 +44,8 @@ public class JDBCArchiveDAO implements ArchiveDAO {
 
     @Override
     public  Optional<Archive> findLastByReport(Report report) {
-        try(PreparedStatement ps = connection.prepareStatement("SELECT * FROM archive" +
+        try(    Connection connection = ds.getConnection();
+                PreparedStatement ps = connection.prepareStatement("SELECT * FROM archive" +
                 " left join usr on archive.inspector_decision_id = usr.id" +
                 " where report_id = ? order by archive.id desc" +
                 " limit 1")){
@@ -65,7 +67,8 @@ public class JDBCArchiveDAO implements ArchiveDAO {
 
     @Override
     public void create(Archive entity) {
-        try (PreparedStatement ps = connection.prepareStatement("INSERT INTO archive" +
+        try (   Connection connection = ds.getConnection();
+                PreparedStatement ps = connection.prepareStatement("INSERT INTO archive" +
                 "(inspector_decision_id, report_id, description, name, decline_reason, status, created, updated)" +
                 " values(?, ?, ?, ?, ?, ?, ?, ?)")) {
             ps.setLong(1, entity.getInspectorDecision().getId());
@@ -85,7 +88,8 @@ public class JDBCArchiveDAO implements ArchiveDAO {
 
     @Override
     public Optional<Archive> findById(Long id) {
-        try(PreparedStatement ps = connection.prepareStatement("SELECT * FROM archive" +
+        try(    Connection connection = ds.getConnection();
+                PreparedStatement ps = connection.prepareStatement("SELECT * FROM archive" +
                 " left join usr on archive.inspector_decision_id = usr.id" +
                 " left join reports on archive.report_id = reports.id" +
                 " where archive.id = ?")){
@@ -109,7 +113,8 @@ public class JDBCArchiveDAO implements ArchiveDAO {
     @Override
     public List<Archive> findAll() {
         List<Archive> result = new ArrayList<>();
-        try(PreparedStatement ps = connection.prepareStatement("SELECT * FROM archive" +
+        try(    Connection connection = ds.getConnection();
+                PreparedStatement ps = connection.prepareStatement("SELECT * FROM archive" +
                 " left join usr on archive.inspector_decision_id = usr.id" +
                 " left join reports on archive.report_id = reports.id")){
             ResultSet rs = ps.executeQuery();
@@ -130,8 +135,9 @@ public class JDBCArchiveDAO implements ArchiveDAO {
 
     @Override
     public void update(Archive entity) {
-        try (PreparedStatement ps = connection.prepareStatement
-                ("Update archive set name = ?, description = ?, decline_reason = ?, status = ?, inspector_decision_id = ?," +
+        try (   Connection connection = ds.getConnection();
+                PreparedStatement ps = connection.prepareStatement("Update archive " +
+                        "set name = ?, description = ?, decline_reason = ?, status = ?, inspector_decision_id = ?," +
                         " report_id = ?, updated = ?" +
                         "where id = ?")) {
             ps.setString(1, entity.getName());
@@ -151,21 +157,13 @@ public class JDBCArchiveDAO implements ArchiveDAO {
 
     @Override
     public void delete(Long id) {
-        try(PreparedStatement ps = connection.prepareStatement("DELETE FROM archive WHERE id = ?")){
+        try(    Connection connection = ds.getConnection();
+                PreparedStatement ps = connection.prepareStatement("DELETE FROM archive WHERE id = ?")){
             ps.setLong(1, id);
             ResultSet rs = ps.executeQuery();
         } catch (SQLException exception) {
             throw new RuntimeException(exception);
         }
 
-    }
-
-    @Override
-    public void close(){
-        try {
-            connection.close();
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
     }
 }

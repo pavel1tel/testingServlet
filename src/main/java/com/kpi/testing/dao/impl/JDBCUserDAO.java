@@ -6,15 +6,16 @@ import com.kpi.testing.entity.User;
 import com.kpi.testing.entity.enums.Role;
 import com.kpi.testing.entity.enums.Status;
 
+import javax.sql.DataSource;
 import java.sql.*;
 import java.time.LocalDate;
 import java.util.*;
 
 public class JDBCUserDAO implements UserDAO {
-    private final Connection connection;
+    private final DataSource ds;
 
-    public JDBCUserDAO(Connection connection) {
-        this.connection = connection;
+    public JDBCUserDAO(DataSource ds) {
+        this.ds = ds;
     }
 
     public static User extractUser(ResultSet rs) throws SQLException {
@@ -37,7 +38,8 @@ public class JDBCUserDAO implements UserDAO {
     @Override
     public Optional<User> findByUsername(String username) {
         Optional<User> user;
-        try (PreparedStatement ps = connection.prepareStatement("SELECT *  FROM usr " +
+        try (   Connection connection = ds.getConnection();
+                PreparedStatement ps = connection.prepareStatement("SELECT *  FROM usr " +
                 "left join report_inspectors " +
                 "on usr.id = usr_id " +
                 "left join reports " +
@@ -81,7 +83,8 @@ public class JDBCUserDAO implements UserDAO {
     @Override
     public Optional<User> findByEmail(String email) {
         Optional<User> user;
-        try (PreparedStatement ps = connection.prepareStatement(
+        try (   Connection connection = ds.getConnection();
+                PreparedStatement ps = connection.prepareStatement(
                 "SELECT *  FROM usr " +
                 "left join report_inspectors " +
                 "on usr.id = usr_id " +
@@ -116,7 +119,8 @@ public class JDBCUserDAO implements UserDAO {
     @Override
     public List<User> findAllByRole(Role role) {
         List<User> result;
-        try (PreparedStatement ps = connection.prepareStatement(
+        try (   Connection connection = ds.getConnection();
+                PreparedStatement ps = connection.prepareStatement(
                 "SELECT *  FROM usr " +
                 "left join report_inspectors " +
                 "on usr.id = usr_id " +
@@ -152,7 +156,8 @@ public class JDBCUserDAO implements UserDAO {
 
     @Override
     public void create(User entity) {
-        try (PreparedStatement ps = connection.prepareStatement
+        try (   Connection connection = ds.getConnection();
+                PreparedStatement ps = connection.prepareStatement
                 ("INSERT INTO usr " +
                         "(`username`, `email`, `password`, `role`, `status`, `updated`, `created`)" +
                         "VALUES(?, ?, ?, ?, ?, ?, ?)")) {
@@ -173,7 +178,8 @@ public class JDBCUserDAO implements UserDAO {
     @Override
     public Optional<User> findById(Long id) {
         Optional<User> user;
-        try (PreparedStatement ps = connection.prepareStatement("SELECT *  FROM usr " +
+        try (   Connection connection = ds.getConnection();
+                PreparedStatement ps = connection.prepareStatement("SELECT *  FROM usr " +
                 "left join report_inspectors " +
                 "on usr.id = usr_id " +
                 "left join reports " +
@@ -213,7 +219,9 @@ public class JDBCUserDAO implements UserDAO {
     @Override
     public List<User> findAll() {
         List<User> result;
-        try (Statement ps = connection.createStatement()) {
+        try (   Connection connection = ds.getConnection();
+                Statement ps = connection.createStatement()) {
+
             ResultSet rs1 = ps.executeQuery(
                     "SELECT *  FROM usr " +
                             "left join report_inspectors " +
@@ -248,7 +256,8 @@ public class JDBCUserDAO implements UserDAO {
 
     @Override
     public void update(User entity) {
-        try (PreparedStatement ps = connection.prepareStatement
+        try (   Connection connection = ds.getConnection();
+                PreparedStatement ps = connection.prepareStatement
                 ("Update usr set status = ?, username = ?, email = ?, password = ?, role = ?, updated = ?" +
                         "where id = ?")) {
             ps.setString(1, entity.getStatus().name());
@@ -267,19 +276,11 @@ public class JDBCUserDAO implements UserDAO {
 
     @Override
     public void delete(Long id) {
-        try (PreparedStatement ps = connection.prepareStatement("Update usr set status = 'Deleted' where id = ?")) {
+        try (   Connection connection = ds.getConnection();
+                PreparedStatement ps = connection.prepareStatement("Update usr set status = 'Deleted' where id = ?")) {
             ps.setLong(1, id);
             ps.executeUpdate();
 
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    @Override
-    public void close() {
-        try {
-            connection.close();
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
