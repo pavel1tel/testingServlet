@@ -31,7 +31,4 @@ public class Pagination<T> {
         return (int) Math.ceil((float) list.size()/limit);
     }
 
-    public static void main(String[] args) {
-        System.out.println("userHome/add".matches("userHome/.*"));
-    }
 }

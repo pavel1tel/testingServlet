@@ -5,6 +5,7 @@ import org.apache.commons.dbcp2.BasicDataSource;
 import javax.sql.DataSource;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Optional;
 import java.util.Properties;
 
 public class DataSourceHolder {
@@ -12,6 +13,8 @@ public class DataSourceHolder {
     private final static String DB_URL = "db.url";
     private final static String DB_USER = "db.user";
     private final static String DB_PASSWORD = "db.password";
+    private final static String DB_MAX_IDLE = "db.MaxIdle";
+    private final static String DB_MAX_PREPARED_STATEMENT = "db.MaxPreparedStatements";
 
     private static volatile BasicDataSource dataSource;
 
@@ -34,12 +37,20 @@ public class DataSourceHolder {
             ds.setUrl(properties.getProperty(DB_URL));
             ds.setUsername(properties.getProperty(DB_USER));
             ds.setPassword(properties.getProperty(DB_PASSWORD));
-            ds.setMaxIdle(30);
-            ds.setMaxOpenPreparedStatements(80);
+            ds.setMaxIdle(Optional.ofNullable(getInt(properties.getProperty(DB_MAX_IDLE))).orElse(30));
+            ds.setMaxOpenPreparedStatements(Optional.ofNullable(getInt(properties.getProperty(DB_MAX_PREPARED_STATEMENT))).orElse(80));
         }
     }
 
-    public void setProp(String prop) {
+    private static Integer getInt(String num) {
+        try {
+            return Integer.parseInt(num);
+        } catch (NumberFormatException e) {
+            return null;
+        }
+    }
+
+    public static void setProp(String prop) {
         if (!PROP_FILE.equals(prop)) {
             PROP_FILE = prop;
             dataSource = null;
