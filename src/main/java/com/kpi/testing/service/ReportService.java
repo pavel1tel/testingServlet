@@ -56,7 +56,7 @@ public class ReportService {
         report.setStatus(ReportStatus.QUEUE);
         report.setOwner(owner);
         List<User> inspectors = getInscpectors();
-        report.setInspectors(getRandomElements(inspectors));
+        report.setInspectors(inspectors);
         reportDAO.create(report);
     }
 
@@ -64,11 +64,6 @@ public class ReportService {
         return userDAO.findAllByRole(Role.ROLE_INSPECTOR);
     }
 
-    private static List<User> getRandomElements(List<User> list) {
-        Collections.shuffle(list);
-        int listSizeIndex = list.size();
-        return list.subList(0, listSizeIndex);
-    }
 
     public UpdateReportDTO getForUpdate(Long id) throws UnknownReportError {
         Report report = reportDAO.findById(id).orElseThrow(UnknownReportError::new);

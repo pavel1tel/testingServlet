@@ -9,7 +9,7 @@ import java.util.Objects;
 
 public class ReportForUserReportTableDTO {
     @NotNull
-    private String id;
+    private Long id;
     @NotNull
     private String name;
     @NotNull
@@ -23,7 +23,7 @@ public class ReportForUserReportTableDTO {
     @NotNull
     private String declineReason;
 
-    public ReportForUserReportTableDTO(String id, String name, String description, ReportStatus status, LocalDate created, LocalDate updated, String reason) {
+    public ReportForUserReportTableDTO(Long id, String name, String description, ReportStatus status, LocalDate created, LocalDate updated, String reason) {
         this.id = id;
         this.name = name;
         this.description = description;
@@ -37,11 +37,11 @@ public class ReportForUserReportTableDTO {
     }
 
 
-    public String getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(Long id) {
         this.id = id;
     }
 

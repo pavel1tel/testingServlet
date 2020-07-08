@@ -30,18 +30,17 @@ public class ReportOwnerService {
 
     public void changeInspector(Report report) {
         List<User> inspectors = report.getInspectors();
+        if (inspectors.size() <= 1) {
+            report.setStatus(ReportStatus.QUEUE);
+            reportDAO.update(report);
+            return;
+        }
         Long inspectorId = archiveDAO.findLastByReport(report).orElseThrow(RuntimeException::new).getInspectorDecision().getId();
         List<User> newInspectors = inspectors.stream()
                 .filter(inspector -> !inspector.getId().equals(inspectorId))
                 .collect(Collectors.toList());
         report.setStatus(ReportStatus.QUEUE);
-        report.setInspectors(getRandomElements(newInspectors));
+        report.setInspectors(newInspectors);
         reportDAO.update(report);
-    }
-
-    private static List<User> getRandomElements(List<User> list) {
-        Collections.shuffle(list);
-        int listSizeIndex = list.size();
-        return list.subList(0, listSizeIndex);
     }
 }

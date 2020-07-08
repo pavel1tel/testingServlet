@@ -55,7 +55,7 @@ public class JDBCReportDAO implements ReportDAO {
                             " left join report_inspectors" +
                             " on reports.id = report_inspectors.report_id" +
                             " left join usr on usr.id = usr_id" +
-                            " where owner_id = ? and name like ?")) {
+                            " where owner_id = ? and name like ? order by reports.id Desc")) {
 
                 ps.setLong(1, user.getId());
                 ps.setString(2, "%" + name + "%");
@@ -114,6 +114,7 @@ public class JDBCReportDAO implements ReportDAO {
             try (PreparedStatement ps = connection.prepareStatement
                     ("insert into reports (`status`, `updated`, `name`, `description`, `decline_reason`, `owner_id`, `created`) " +
                             "VALUES(?, ?, ?, ?, ?, ?, ?)")) {
+                connection.prepareStatement("SET @@SESSION.information_schema_stats_expiry = 0;").executeQuery();
                 connection.setAutoCommit(false);
                 ps.setString(1, entity.getStatus().name());
                 ps.setString(2, LocalDate.now().toString());
